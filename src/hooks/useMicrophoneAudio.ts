@@ -102,7 +102,7 @@ export function useMicrophoneAudio(active: boolean = false): UseMicrophoneAudioR
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.3; // extra smoothing in audio hardware
+      analyser.smoothingTimeConstant = 0.75; // smooth audio hardware averaging to eliminate flutter
       source.connect(analyser);
       analyserRef.current = analyser;
 
@@ -125,10 +125,10 @@ export function useMicrophoneAudio(active: boolean = false): UseMicrophoneAudioR
         analyserRef.current.getByteFrequencyData(freqData);
         analyserRef.current.getByteTimeDomainData(timeData);
 
-        // 1. Vocal speech frequencies (approx 85Hz - 3.8kHz)
+        // 1. Vocal speech frequencies (approx 85Hz - 4kHz)
         let vocalSum = 0;
         let vocalMax = 0;
-        const maxBin = Math.min(freqData.length, 45);
+        const maxBin = Math.min(freqData.length, 64);
         for (let i = 1; i < maxBin; i++) {
           const val = freqData[i];
           vocalSum += val;
@@ -147,35 +147,40 @@ export function useMicrophoneAudio(active: boolean = false): UseMicrophoneAudioR
         }
         const rms = Math.sqrt(sumSq / timeData.length);
 
-        // 3. Normalized vocal energy calculation
-        const freqSignal = Math.max(0, (vocalAvg - 4.0) / 22);
-        const peakSignal = Math.max(0, (peakDev - 0.015) / 0.14);
-        const rmsSignal = Math.max(0, (rms - 0.004) / 0.04);
-        const rawScore = Math.min(1, Math.max(freqSignal, peakSignal, rmsSignal) * 1.4);
+        // 3. Highly sensitive, responsive vocal signal (scales 0 to 1 with voice)
+        const freqSignal = Math.max(0, (vocalAvg - 1.8) / 15);
+        const peakSignal = Math.max(0, (peakDev - 0.01) / 0.09);
+        const rmsSignal = Math.max(0, (rms - 0.003) / 0.028);
+        let rawScore = Math.min(1, Math.max(freqSignal, peakSignal, rmsSignal) * 1.7);
 
-        // 4. Smooth organic attack and graceful decay
-        const rate = rawScore > smoothedVolumeRef.current ? 0.28 : 0.10;
+        // Noise gate: cleanly zero out low ambient room noise to eliminate jitter
+        if (rawScore < 0.035) {
+          rawScore = 0;
+        }
+
+        // 4. Smooth organic attack and graceful, natural release
+        const rate = rawScore > smoothedVolumeRef.current ? 0.28 : 0.09;
         smoothedVolumeRef.current += (rawScore - smoothedVolumeRef.current) * rate;
-        if (smoothedVolumeRef.current < 0.005) {
+        if (smoothedVolumeRef.current < 0.004) {
           smoothedVolumeRef.current = 0;
         }
 
         const currentVol = Math.round(smoothedVolumeRef.current * 100) / 100;
 
-        // Controlled throttle (every ~42ms / ~24 updates per sec) to avoid React re-render lag,
-        // but instantaneous update when silence starts or speech starts
+        // Controlled dispatch (~32ms / ~30fps) with instantaneous boundary triggers:
+        // Keeps UI silky smooth and prevents React re-render lagging when voice modules are active
         const elapsed = timestamp - lastUpdateTimestampRef.current;
         const isBoundary =
           (currentVol === 0 && lastDispatchedVolumeRef.current > 0) ||
-          (currentVol > 0.05 && lastDispatchedVolumeRef.current === 0);
+          (currentVol > 0.02 && lastDispatchedVolumeRef.current === 0);
 
-        if (elapsed > 40 || isBoundary) {
-          if (Math.abs(currentVol - lastDispatchedVolumeRef.current) >= 0.02 || isBoundary) {
+        if (elapsed >= 32 || isBoundary) {
+          if (Math.abs(currentVol - lastDispatchedVolumeRef.current) >= 0.015 || isBoundary) {
             lastDispatchedVolumeRef.current = currentVol;
             lastUpdateTimestampRef.current = timestamp;
             setVolume(currentVol);
             setRawVolume(Math.round(rawScore * 100) / 100);
-            setIsAudioDetected(currentVol > 0.04);
+            setIsAudioDetected(currentVol > 0.03);
           }
         }
 

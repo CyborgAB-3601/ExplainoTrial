@@ -27,7 +27,7 @@ interface ExoOrbProps {
   onPointerCancel?: (e: React.PointerEvent<HTMLDivElement>) => void;
 }
 
-export const ExoOrb: React.FC<ExoOrbProps> = ({
+export const ExoOrb: React.FC<ExoOrbProps> = React.memo(({
   speechBubbleTitle = "Hi! I'm EXO",
   speechBubbleSubtitle = "Explain it to me",
   speechBubbleEmoji = "✨",
@@ -68,6 +68,85 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
   const [revolveProgress, setRevolveProgress] = useState(0); // 0 to 1
   const startAngleRef = useRef(0);
   const startYRef = useRef(0);
+  const revolveRafRef = useRef<number | null>(null);
+  
+  const [demoListening, setDemoListening] = useState(false);
+  const [isInternalHolding, setIsInternalHolding] = useState(false);
+  const holdTimerRef = useRef<number>(0);
+  const effectiveListening = isListening || demoListening || isInternalHolding;
+  const effectiveListeningRef = useRef(effectiveListening);
+  effectiveListeningRef.current = effectiveListening;
+
+  // Immediately cancel any in-flight revolution when listening starts so it never gets stuck
+  useEffect(() => {
+    if (effectiveListening) {
+      if (revolveRafRef.current) {
+        cancelAnimationFrame(revolveRafRef.current);
+        revolveRafRef.current = null;
+      }
+      setRevolving(false);
+      setRevolveProgress(0);
+    }
+  }, [effectiveListening]);
+
+  // Clean up animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (revolveRafRef.current) {
+        cancelAnimationFrame(revolveRafRef.current);
+      }
+    };
+  }, []);
+
+  // Silky 60-144fps audio smoothing RAF loop (Zero React re-renders, zero jitter)
+  const targetVolumeRef = useRef(0);
+  targetVolumeRef.current = listeningVolume;
+  const smoothVolumeRef = useRef(0);
+  const audioStageRef = useRef<HTMLDivElement>(null);
+  const audioRafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const tickAudio = () => {
+      if (!active) return;
+
+      const target = effectiveListeningRef.current ? targetVolumeRef.current : 0;
+      const current = smoothVolumeRef.current;
+
+      // Asymmetric organic lerp: quick attack (0.22) + graceful soft decay (0.09)
+      const rate = target > current ? 0.22 : 0.09;
+      const next = current + (target - current) * rate;
+      const resolved = Math.abs(next - target) < 0.0008 ? target : next;
+      smoothVolumeRef.current = resolved;
+
+      if (audioStageRef.current) {
+        audioStageRef.current.style.setProperty('--orb-vol', resolved.toFixed(4));
+      }
+
+      // If finished easing down to 0 while not listening, pause loop to save resources
+      if (!effectiveListeningRef.current && resolved === 0) {
+        audioRafRef.current = null;
+        return;
+      }
+
+      audioRafRef.current = requestAnimationFrame(tickAudio);
+    };
+
+    if (effectiveListening || smoothVolumeRef.current > 0 || listeningVolume > 0) {
+      if (!audioRafRef.current) {
+        audioRafRef.current = requestAnimationFrame(tickAudio);
+      }
+    }
+
+    return () => {
+      active = false;
+      if (audioRafRef.current) {
+        cancelAnimationFrame(audioRafRef.current);
+        audioRafRef.current = null;
+      }
+    };
+  }, [effectiveListening, listeningVolume]);
   
   const [isPeeking, setIsPeeking] = useState(false);
 
@@ -230,7 +309,7 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
 
   // Trigger smooth 3D spherical revolution turn starting from the CURRENT mouse gaze position
   const triggerFullTurn = () => {
-    if (revolving) return;
+    if (revolving || effectiveListeningRef.current) return;
 
     // Calculate current gaze angle offset from mouse position:
     // When mouse is right (e.g. x = 0.8), current gaze angle is around +0.36 rad (~20 deg).
@@ -247,6 +326,13 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
     const duration = 2100; // 2.1s for a luxurious, silky 360° turn
 
     const step = (currentTime: number) => {
+      if (effectiveListeningRef.current) {
+        setRevolving(false);
+        setRevolveProgress(0);
+        revolveRafRef.current = null;
+        return;
+      }
+
       const elapsed = currentTime - startTime;
       const p = Math.min(1, elapsed / duration);
 
@@ -255,8 +341,9 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
       setRevolveProgress(eased);
 
       if (p < 1) {
-        requestAnimationFrame(step);
+        revolveRafRef.current = requestAnimationFrame(step);
       } else {
+        revolveRafRef.current = null;
         setRevolving(false);
         setRevolveProgress(0);
         // Cute blink right after landing back at current mouse state
@@ -265,21 +352,81 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
       }
     };
 
-    requestAnimationFrame(step);
+    revolveRafRef.current = requestAnimationFrame(step);
   };
 
   const handleOrbClick = () => {
-    setIsJumping(true);
-    triggerFullTurn();
-    setSpeechText({ title: "Wheee! ✨", subtitle: "Full 3D turn!", emoji: "💖" });
-    setTimeout(() => {
-      setIsJumping(false);
+    if (demoListening) {
+      setDemoListening(false);
       setSpeechText({
         title: speechBubbleTitle,
         subtitle: speechBubbleSubtitle,
         emoji: speechBubbleEmoji,
       });
-    }, 2100);
+      return;
+    }
+    setDemoListening(true);
+    setSpeechText({ 
+      title: "I'm listening!", 
+      subtitle: "Listening closely... ✨", 
+      emoji: "🔮" 
+    });
+    setTimeout(() => {
+      setDemoListening(false);
+      setSpeechText({
+        title: speechBubbleTitle,
+        subtitle: speechBubbleSubtitle,
+        emoji: speechBubbleEmoji,
+      });
+    }, 4500);
+  };
+
+  const handleInternalPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (onPointerDown) {
+      onPointerDown(e);
+      return;
+    }
+    holdTimerRef.current = performance.now();
+    setIsInternalHolding(true);
+    setSpeechText({ 
+      title: "I'm listening!", 
+      subtitle: "Hold to talk, release when done ✨", 
+      emoji: "🔮" 
+    });
+  };
+
+  const handleInternalPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (onPointerUp) {
+      onPointerUp(e);
+      return;
+    }
+    const pressDuration = performance.now() - holdTimerRef.current;
+    setIsInternalHolding(false);
+    if (pressDuration < 280) {
+      handleOrbClick();
+    } else {
+      setSpeechText({
+        title: speechBubbleTitle,
+        subtitle: speechBubbleSubtitle,
+        emoji: speechBubbleEmoji,
+      });
+    }
+  };
+
+  const handleInternalPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsHovered(false);
+    if (onPointerLeave) {
+      onPointerLeave(e);
+      return;
+    }
+    if (isInternalHolding) {
+      setIsInternalHolding(false);
+      setSpeechText({
+        title: speechBubbleTitle,
+        subtitle: speechBubbleSubtitle,
+        emoji: speechBubbleEmoji,
+      });
+    }
   };
 
   // Dimensions based on size prop
@@ -363,24 +510,19 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
       {/* Main Interactive Stage */}
       <div 
         ref={orbRef}
-        onClick={() => {
-          if (!onPointerDown) {
-            handleOrbClick();
-          }
+        onPointerDown={handleInternalPointerDown}
+        onPointerUp={handleInternalPointerUp}
+        onPointerLeave={handleInternalPointerLeave}
+        onPointerCancel={(e) => {
+          setIsInternalHolding(false);
+          onPointerCancel?.(e);
         }}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerLeave={(e) => {
-          setIsHovered(false);
-          onPointerLeave?.(e);
-        }}
-        onPointerCancel={onPointerCancel}
         onMouseEnter={() => setIsHovered(true)}
         className="relative flex flex-col items-center justify-center cursor-pointer group"
       >
         
-        {/* Floating Speech Bubble */}
-        {showSpeechBubble && Boolean(speechText.title || speechText.subtitle) && (
+        {/* Floating Speech Bubble - Hidden during listening */}
+        {showSpeechBubble && !effectiveListening && Boolean(speechText.title || speechText.subtitle) && (
           <div 
             className={`absolute z-30 transition-all duration-300 transform group-hover:scale-105 pointer-events-none ${
               speechBubblePosition === 'top-right' 
@@ -412,205 +554,350 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
         )}
 
         {/* Vertical Float & Squishy Jump Wrapper */}
-        <div className={`relative flex items-center justify-center ${isJumping ? 'animate-orb-jump' : 'animate-orb-float'}`}>
-          
-          {/* Outer Luminous Neon Aura Glow (Hardware Accelerated, Smooth Dynamic Vol) */}
-          <div 
-            className="absolute inset-0 rounded-full blur-2xl pointer-events-none"
+        <div 
+          className={`relative ${sizeClasses} flex items-center justify-center ${
+            effectiveListening ? '' : isJumping ? 'animate-orb-jump' : 'animate-orb-float'
+          }`}
+          style={{
+            transform: effectiveListening
+              ? 'translateY(-6px) scale(1.18)'
+              : undefined,
+            transformOrigin: '50% 50%',
+            transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+            zIndex: effectiveListening ? 35 : 10,
+            willChange: 'transform',
+          }}
+        >
+          {/* Audio Reactivity Wrapper (Continuous GPU-interpolated pulse, zero interrupted transitions) */}
+          <div
+            ref={audioStageRef}
+            className="relative w-full h-full flex items-center justify-center pointer-events-none"
             style={{
-              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.78) 0%, rgba(236, 72, 153, 0.55) 45%, rgba(56, 189, 248, 0.4) 70%, transparent 85%)',
-              transform: isListening 
-                ? `scale(${1.15 + listeningVolume * 0.25})`
-                : isHovered 
-                ? 'scale(1.2)' 
-                : 'scale(1.1)',
-              opacity: isListening ? 0.75 + listeningVolume * 0.25 : isHovered ? 0.9 : 0.7,
-              transition: isListening
-                ? 'transform 0.08s ease-out, opacity 0.08s ease-out'
-                : 'transform 0.3s ease-out, opacity 0.3s ease-out',
-              willChange: 'transform, opacity',
-            }}
-          />
-
-          {/* Active Listening Soundwave Halo Rings (Hardware Accelerated) */}
-          {isListening && (
-            <>
-              <div
-                className="absolute inset-0 rounded-full border border-purple-400/40 pointer-events-none animate-ping opacity-35"
-                style={{ animationDuration: '2.2s' }}
-              />
-              <div
-                className="absolute inset-0 rounded-full border-2 border-purple-400/60 pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.5)]"
-                style={{
-                  transform: `scale(${1.12 + listeningVolume * 0.26})`,
-                  opacity: 0.35 + listeningVolume * 0.65,
-                  transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-                  willChange: 'transform, opacity',
-                }}
-              />
-              <div
-                className="absolute inset-0 rounded-full border border-pink-400/50 pointer-events-none shadow-[0_0_24px_rgba(244,114,182,0.4)]"
-                style={{
-                  transform: `scale(${1.24 + listeningVolume * 0.38})`,
-                  opacity: Math.max(0, listeningVolume * 0.85),
-                  transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-                  willChange: 'transform, opacity',
-                }}
-              />
-            </>
-          )}
-
-          {/* ================= EXACT ETHEREAL GLOWING ORB BODY ================= */}
-          <div 
-            className={`relative ${sizeClasses} rounded-full overflow-hidden ${
-              accessory === 'headphones'
-                ? 'animate-[headphoneGroove_2.2s_ease-in-out_infinite]'
-                : accessory === 'controller'
-                ? 'animate-[gamerWiggle_1.8s_ease-in-out_infinite]'
-                : ''
-            }`}
-            style={{
-              background: `
-                radial-gradient(circle at 50% 18%, #FFFFFF 0%, #FDF2F8 12%, #E879F9 35%, #A855F7 58%, #818CF8 80%, #60A5FA 98%)
-              `,
-              boxShadow: `
-                0 0 45px rgba(192, 132, 252, 0.55),
-                0 0 85px rgba(244, 114, 182, 0.35),
-                inset 0 0 25px rgba(255, 255, 255, 0.85),
-                inset 0 -18px 30px rgba(96, 165, 250, 0.5),
-                inset 0 15px 25px rgba(255, 255, 255, 0.7)
-              `,
-              border: '2px solid rgba(255, 255, 255, 0.75)',
-              transform: isListening
-                ? `scale(${1.02 + listeningVolume * 0.08}) translateY(-${listeningVolume * 5}px)`
-                : isHovered 
-                ? 'scale(1.03)' 
+              transform: effectiveListening
+                ? 'scale(calc(1 + var(--orb-vol, 0) * 0.12))'
                 : 'scale(1)',
-              transition: isListening
-                ? 'transform 0.08s ease-out'
-                : 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
               willChange: 'transform',
             }}
           >
-            {/* Layer 1: Soft Cyan/Blue Glow on bottom-left */}
+          
+            {/* Outer Luminous Neon Aura Glow (Atmospheric ultraviolet & cyan bloom) */}
             <div 
-              className="absolute inset-0 rounded-full pointer-events-none transition-transform duration-200"
+              className="absolute inset-0 rounded-full blur-2xl pointer-events-none"
               style={{
-                background: 'radial-gradient(circle at 22% 78%, rgba(96, 165, 250, 0.85) 0%, transparent 52%)',
-                transform: `translate(${cyanShiftX}px, ${cyanShiftY}px)`,
+                background: effectiveListening
+                  ? 'radial-gradient(circle, rgba(111, 50, 233, 0.88) 0%, rgba(97, 131, 239, 0.55) 45%, rgba(56, 189, 248, 0.35) 70%, transparent 85%)'
+                  : 'radial-gradient(circle, rgba(168, 85, 247, 0.78) 0%, rgba(236, 72, 153, 0.55) 45%, rgba(56, 189, 248, 0.4) 70%, transparent 85%)',
+                transform: effectiveListening 
+                  ? 'scale(calc(1.32 + var(--orb-vol, 0) * 0.14))'
+                  : isHovered 
+                  ? 'scale(1.2)' 
+                  : 'scale(1.1)',
+                opacity: effectiveListening ? 0.98 : isHovered ? 0.9 : 0.7,
+                transition: 'opacity 0.22s ease-out',
+                willChange: 'transform, opacity',
               }}
             />
 
-            {/* Layer 2: Soft Peach-Pink Glow on right */}
+            {/* ================= REFERENCE BACKGROUND WARP & HARMONIC LIVING AURAS ================= */}
             <div 
-              className="absolute inset-0 rounded-full pointer-events-none transition-transform duration-200"
+              className="absolute pointer-events-none overflow-visible flex items-center justify-center transition-opacity duration-200"
               style={{
-                background: 'radial-gradient(circle at 84% 60%, rgba(244, 114, 182, 0.85) 0%, transparent 50%)',
-                transform: `translate(${pinkShiftX}px, ${pinkShiftY}px)`,
+                inset: -70,
+                zIndex: 4, // Behind orb body (zIndex: 20)
+                opacity: effectiveListening ? 1 : 0,
               }}
-            />
-
-            {/* Layer 3: Top Diffuse Specular Arc Highlight */}
-            <div 
-              className="absolute top-2 left-6 right-6 h-14 bg-gradient-to-b from-white/90 via-white/30 to-transparent rounded-full blur-[1px] transform -rotate-12 pointer-events-none"
-              style={{
-                transform: `rotate(-12deg) translate(${-mouseOffset.x * 4}px, ${-mouseOffset.y * 3}px)`,
-              }}
-            />
-
-            {/* Layer 4: Frosted Glass Translucency Overlay */}
-            <div className="absolute inset-0 rounded-full backdrop-blur-[2px] pointer-events-none" />
-
-            {/* Cute Cheek Blush (lights up when blushing, in password mode, headphones on, or when speaking into mic) */}
-            <div 
-              className={`absolute bottom-9 inset-x-6 flex justify-between px-3 transition-opacity duration-300 pointer-events-none ${
-                showBlush || isPasswordMode || accessory === 'headphones' || (isListening && listeningVolume > 0.05) ? 'opacity-90' : 'opacity-0'
-              }`}
             >
-              <div className="w-5 h-3 rounded-full bg-pink-300/80 blur-[2px]" />
-              <div className="w-5 h-3 rounded-full bg-pink-300/80 blur-[2px]" />
+              {/* Layer 1: Atmospheric Outer Harmonic Expansion Bloom */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  inset: -24,
+                  background: 'radial-gradient(circle, transparent 48%, rgba(111, 50, 233, 0.52) 66%, rgba(97, 131, 239, 0.42) 78%, rgba(56, 189, 248, 0.22) 90%, transparent 98%)',
+                  transform: 'scale(calc(1.12 + var(--orb-vol, 0) * 0.38))',
+                  opacity: 'calc(0.65 + var(--orb-vol, 0) * 0.35)',
+                  filter: 'blur(22px)',
+                  willChange: 'transform, opacity',
+                }}
+              />
+
+              {/* Layer 2: Mid-Field Fluid Resonant Gradient Halo */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  inset: 4,
+                  background: 'radial-gradient(circle, transparent 50%, rgba(133, 62, 242, 0.68) 68%, rgba(97, 131, 239, 0.5) 82%, transparent 99%)',
+                  transform: 'scale(calc(1.08 + var(--orb-vol, 0) * 0.28))',
+                  opacity: 'calc(0.78 + var(--orb-vol, 0) * 0.22)',
+                  filter: 'blur(16px)',
+                  willChange: 'transform, opacity',
+                }}
+              />
+
+              {/* Layer 3: Rotating Liquid Conic Aurora Shimmer */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  inset: 16,
+                  background: 'conic-gradient(from 0deg, rgba(97, 131, 239, 0.48), rgba(111, 50, 233, 0.65), rgba(168, 85, 247, 0.52), rgba(56, 189, 248, 0.48), rgba(97, 131, 239, 0.48))',
+                  maskImage: 'radial-gradient(circle, transparent 54%, black 70%, transparent 92%)',
+                  WebkitMaskImage: 'radial-gradient(circle, transparent 54%, black 70%, transparent 92%)',
+                  transform: 'scale(calc(1.04 + var(--orb-vol, 0) * 0.22))',
+                  opacity: 'calc(0.8 + var(--orb-vol, 0) * 0.2)',
+                  filter: 'blur(14px)',
+                  animation: 'spin 16s linear infinite',
+                  willChange: 'transform, opacity',
+                }}
+              />
+
+              {/* Layer 4: Close-Hugging Vibrant Voice Ripple Pulse */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  inset: 28,
+                  background: 'radial-gradient(circle, transparent 52%, rgba(111, 50, 233, 0.75) 74%, rgba(97, 131, 239, 0.55) 86%, transparent 96%)',
+                  transform: 'scale(calc(1.02 + var(--orb-vol, 0) * 0.16))',
+                  opacity: 'calc(0.85 + var(--orb-vol, 0) * 0.15)',
+                  filter: 'blur(8px)',
+                  willChange: 'transform, opacity',
+                }}
+              />
             </div>
 
-            {/* ================= EXO'S GLOWING EYES (CONTINUOUS FROM MOUSE STATE) ================= */}
+            {/* ================= EXACT ETHEREAL GLOWING ORB BODY ================= */}
             <div 
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              className={`relative w-full h-full overflow-hidden rounded-full ${
+                effectiveListening
+                  ? 'animate-[fluidOrbMorph_7.5s_ease-in-out_infinite]'
+                  : ''
+              } ${
+                accessory === 'headphones' && !effectiveListening
+                  ? 'animate-[headphoneGroove_2.2s_ease-in-out_infinite]'
+                  : accessory === 'controller' && !effectiveListening
+                  ? 'animate-[gamerWiggle_1.8s_ease-in-out_infinite]'
+                  : ''
+              }`}
               style={{
-                transform: `translate(${finalEyeX}px, ${finalEyeY}px) scaleX(${finalScaleX})`,
-                opacity: finalOpacity,
-                // Continuous motion: no transition delay during revolution, smooth lerp when idle
-                transition: revolving ? 'none' : 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                position: 'relative',
+                zIndex: 20, // Orb body is in FRONT of all background gradients (zIndex: 4)
+                transform: isHovered && !effectiveListening
+                  ? 'scale(1.03)' 
+                  : 'scale(1)',
+                transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                willChange: 'transform',
               }}
             >
-              <div className="flex items-center gap-5 sm:gap-6 transform -translate-y-1">
-                
-                {/* Left Eye: Exact Thick Upward Chevron with Magical Purple Neon Bloom */}
-                <div 
-                  className={`transition-all duration-200 ${
-                    isBlinking || (isPasswordMode && showPassword) 
-                      ? 'scale-y-[0.08]' 
-                      : ''
-                  }`}
-                  style={{
-                    filter: `
-                      drop-shadow(0 0 6px #FFFFFF)
-                      drop-shadow(0 0 14px rgba(255, 255, 255, 0.9))
-                      drop-shadow(0 0 24px rgba(216, 180, 254, 0.95))
-                      drop-shadow(0 0 38px rgba(168, 85, 247, 0.85))
-                      drop-shadow(0 0 50px rgba(236, 72, 153, 0.6))
-                    `,
-                  }}
-                >
-                  <svg 
-                    width="32" 
-                    height="26" 
-                    viewBox="0 0 32 26" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      d="M5.5 21L16 6L26.5 21" 
-                      stroke="#FFFFFF" 
-                      strokeWidth="6.5" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                    />
-                  </svg>
-                </div>
+              {/* IDLE MODE BASE SKIN (Instant GPU Crossfade) */}
+              <div 
+                className="absolute inset-0 rounded-[inherit] pointer-events-none transition-opacity duration-200"
+                style={{
+                  opacity: effectiveListening ? 0 : 1,
+                  background: `radial-gradient(circle at 50% 18%, #FFFFFF 0%, #FDF2F8 12%, #E879F9 35%, #A855F7 58%, #818CF8 80%, #60A5FA 98%)`,
+                  boxShadow: `
+                    0 0 45px rgba(192, 132, 252, 0.55),
+                    0 0 85px rgba(244, 114, 182, 0.35),
+                    inset 0 0 25px rgba(255, 255, 255, 0.85),
+                    inset 0 -18px 30px rgba(96, 165, 250, 0.5),
+                    inset 0 15px 25px rgba(255, 255, 255, 0.7)
+                  `,
+                  border: '2px solid rgba(255, 255, 255, 0.75)',
+                  willChange: 'opacity',
+                }}
+              />
 
-                {/* Right Eye: Upward Chevron or Wink Curve */}
-                <div 
-                  className={`transition-all duration-200 ${
-                    isBlinking || isWinking || (isPasswordMode && isPeeking) || (isPasswordMode && showPassword) 
-                      ? 'scale-y-[0.12] translate-y-1' 
-                      : ''
-                  }`}
-                  style={{
-                    opacity: isInspectingEmail ? 0 : 1,
-                    filter: `
-                      drop-shadow(0 0 6px #FFFFFF)
-                      drop-shadow(0 0 14px rgba(255, 255, 255, 0.9))
-                      drop-shadow(0 0 24px rgba(216, 180, 254, 0.95))
-                      drop-shadow(0 0 38px rgba(168, 85, 247, 0.85))
-                      drop-shadow(0 0 50px rgba(236, 72, 153, 0.6))
-                    `,
-                  }}
-                >
-                  {isWinking ? (
-                    <svg 
-                      width="32" 
-                      height="26" 
-                      viewBox="0 0 32 26" 
-                      fill="none" 
-                      xmlns="http://www.w3.org/2000/svg"
+              {/* LISTENING MODE BASE SKIN (Exact Reference Deep Violet with GPU Crossfade) */}
+              <div 
+                className="absolute inset-0 rounded-[inherit] pointer-events-none transition-opacity duration-200"
+                style={{
+                  opacity: effectiveListening ? 1 : 0,
+                  background: `radial-gradient(circle at 45% 38%, #853EF2 0%, #6F32E9 36%, #6128E7 62%, #5123E8 84%, #3B0764 100%)`,
+                  boxShadow: `
+                    0 0 38px rgba(111, 50, 233, 0.88),
+                    0 0 78px rgba(97, 131, 239, 0.55),
+                    0 0 115px rgba(133, 62, 242, 0.35),
+                    inset 0 0 28px rgba(97, 131, 239, 0.65),
+                    inset 14px 12px 32px rgba(133, 62, 242, 0.65),
+                    inset -12px -12px 30px rgba(81, 35, 232, 0.85)
+                  `,
+                  border: '2px solid rgba(133, 62, 242, 0.75)',
+                  willChange: 'opacity',
+                }}
+              />
+
+              {/* LISTENING MODE INTERNAL COLOR ACCENTS (Exact Reference Match) */}
+              {/* Luminous Cyan Rim Glow on Left & Perimeter */}
+              <div 
+                className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                style={{
+                  background: 'radial-gradient(circle at 16% 46%, rgba(97, 131, 239, 0.92) 0%, rgba(56, 189, 248, 0.5) 30%, transparent 60%)',
+                  opacity: effectiveListening ? 1 : 0,
+                  mixBlendMode: 'screen',
+                }}
+              />
+
+              {/* Soft Specular Violet/Lavender Sheen on Top */}
+              <div 
+                className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                style={{
+                  background: 'radial-gradient(ellipse at 44% 18%, rgba(216, 180, 254, 0.6) 0%, rgba(168, 85, 247, 0.25) 45%, transparent 70%)',
+                  opacity: effectiveListening ? 1 : 0,
+                }}
+              />
+
+              {/* Deep Ultraviolet Core Depth */}
+              <div 
+                className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                style={{
+                  background: 'radial-gradient(circle at 80% 70%, rgba(81, 35, 232, 0.65) 0%, transparent 55%)',
+                  opacity: effectiveListening ? 1 : 0,
+                }}
+              />
+
+              {/* IDLE MODE LAYERS */}
+              {/* Layer 1: Soft Cyan/Blue Glow on bottom-left */}
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none transition-all duration-200"
+                style={{
+                  background: 'radial-gradient(circle at 22% 78%, rgba(96, 165, 250, 0.85) 0%, transparent 52%)',
+                  transform: `translate(${cyanShiftX}px, ${cyanShiftY}px)`,
+                  opacity: effectiveListening ? 0 : 1,
+                }}
+              />
+
+              {/* Layer 2: Soft Peach-Pink Glow on right */}
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none transition-all duration-200"
+                style={{
+                  background: 'radial-gradient(circle at 84% 60%, rgba(244, 114, 182, 0.85) 0%, transparent 50%)',
+                  transform: `translate(${pinkShiftX}px, ${pinkShiftY}px)`,
+                  opacity: effectiveListening ? 0 : 1,
+                }}
+              />
+
+              {/* Layer 3: Top Diffuse Specular Arc Highlight */}
+              <div 
+                className="absolute top-2 left-6 right-6 h-14 bg-gradient-to-b from-white/90 via-white/30 to-transparent rounded-full blur-[1px] transform -rotate-12 pointer-events-none transition-opacity duration-200"
+                style={{
+                  transform: `rotate(-12deg) translate(${-mouseOffset.x * 4}px, ${-mouseOffset.y * 3}px)`,
+                  opacity: effectiveListening ? 0 : 1,
+                }}
+              />
+
+              {/* Layer 4: Frosted Glass Translucency Overlay */}
+              <div className="absolute inset-0 rounded-full backdrop-blur-[2px] pointer-events-none" />
+
+              {/* Cute Cheek Blush (only when not listening) */}
+              <div 
+                className={`absolute bottom-9 inset-x-6 flex justify-between px-3 transition-opacity duration-200 pointer-events-none ${
+                  !effectiveListening && (showBlush || isPasswordMode || accessory === 'headphones') ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <div className="w-5 h-3 rounded-full bg-pink-300/80 blur-[2px]" />
+                <div className="w-5 h-3 rounded-full bg-pink-300/80 blur-[2px]" />
+              </div>
+
+              {/* ================= EXO'S GLOWING EYES (Crossfading Containers) ================= */}
+              {/* 1. Listening Arch Eyes */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-200 ease-out"
+                style={{
+                  transform: `translate(${effectiveGaze.x * 6}px, ${effectiveGaze.y * 5 - 2}px) ${
+                    effectiveListening ? 'scale(1)' : 'scale(0.85)'
+                  }`,
+                  opacity: effectiveListening ? 1 : 0,
+                  willChange: 'opacity, transform',
+                }}
+              >
+                {/* Outer Breathing Animation Container */}
+                <div className="animate-[listeningEyeBreathe_3.2s_ease-in-out_infinite]">
+                  {/* Inner Voice-Reactive Volume Scaling Container (Zero transition conflict) */}
+                  <div 
+                    className="flex items-center gap-5 sm:gap-6 transform -translate-y-1"
+                    style={{
+                      transform: 'translateY(-2px) scale(calc(1 + var(--orb-vol, 0) * 0.1))',
+                      willChange: 'transform',
+                    }}
+                  >
+                    {/* Left Eye */}
+                    <div 
+                      style={{
+                        filter: `
+                          drop-shadow(0 0 6px #FFFFFF)
+                          drop-shadow(0 0 16px rgba(216, 180, 254, 0.95))
+                          drop-shadow(0 0 32px rgba(111, 50, 233, 0.85))
+                        `,
+                      }}
                     >
-                      <path 
-                        d="M5 10C9 18 23 18 27 10" 
-                        stroke="#FFFFFF" 
-                        strokeWidth="6.5" 
-                        strokeLinecap="round" 
-                      />
-                    </svg>
-                  ) : (
+                      <svg 
+                        width="34" 
+                        height="34" 
+                        viewBox="0 0 34 34" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          d="M 6.5 25 C 6 14, 11 4, 17 4 C 23 4, 28 14, 27.5 25 C 27.5 27.2, 25 28.2, 23 26.2 C 20 22.5, 14 22.5, 11 26.2 C 9 28.2, 6.5 27.2, 6.5 25 Z" 
+                          fill="#FFFFFF" 
+                        />
+                      </svg>
+                    </div>
+
+                    {/* Right Eye */}
+                    <div 
+                      style={{
+                        filter: `
+                          drop-shadow(0 0 6px #FFFFFF)
+                          drop-shadow(0 0 16px rgba(216, 180, 254, 0.95))
+                          drop-shadow(0 0 32px rgba(111, 50, 233, 0.85))
+                        `,
+                      }}
+                    >
+                      <svg 
+                        width="34" 
+                        height="34" 
+                        viewBox="0 0 34 34" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          d="M 6.5 25 C 6 14, 11 4, 17 4 C 23 4, 28 14, 27.5 25 C 27.5 27.2, 25 28.2, 23 26.2 C 20 22.5, 14 22.5, 11 26.2 C 9 28.2, 6.5 27.2, 6.5 25 Z" 
+                          fill="#FFFFFF" 
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Normal Idle Eyes (Chevrons / Winking / Blinking) */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-200 ease-out"
+                style={{
+                  transform: `translate(${finalEyeX}px, ${finalEyeY}px) scaleX(${finalScaleX}) ${
+                    effectiveListening ? 'scale(0.85)' : 'scale(1)'
+                  }`,
+                  opacity: effectiveListening ? 0 : finalOpacity,
+                  transition: revolving ? 'none' : 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease-out',
+                  willChange: 'opacity, transform',
+                }}
+              >
+                <div className="flex items-center gap-5 sm:gap-6 transform -translate-y-1">
+                  {/* Left Eye: Exact Thick Upward Chevron with Magical Purple Neon Bloom */}
+                  <div 
+                    className={`transition-all duration-200 ${
+                      isBlinking || (isPasswordMode && showPassword) 
+                        ? 'scale-y-[0.08]' 
+                        : ''
+                    }`}
+                    style={{
+                      filter: `
+                        drop-shadow(0 0 6px #FFFFFF)
+                        drop-shadow(0 0 14px rgba(255, 255, 255, 0.9))
+                        drop-shadow(0 0 24px rgba(216, 180, 254, 0.95))
+                        drop-shadow(0 0 38px rgba(168, 85, 247, 0.85))
+                        drop-shadow(0 0 50px rgba(236, 72, 153, 0.6))
+                      `,
+                    }}
+                  >
                     <svg 
                       width="32" 
                       height="26" 
@@ -626,15 +913,68 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
                         strokeLinejoin="round" 
                       />
                     </svg>
-                  )}
+                  </div>
+
+                  {/* Right Eye: Upward Chevron or Wink Curve */}
+                  <div 
+                    className={`transition-all duration-200 ${
+                      isBlinking || isWinking || (isPasswordMode && isPeeking) || (isPasswordMode && showPassword) 
+                        ? 'scale-y-[0.12] translate-y-1' 
+                        : ''
+                    }`}
+                    style={{
+                      opacity: isInspectingEmail ? 0 : 1,
+                      filter: `
+                        drop-shadow(0 0 6px #FFFFFF)
+                        drop-shadow(0 0 14px rgba(255, 255, 255, 0.9))
+                        drop-shadow(0 0 24px rgba(216, 180, 254, 0.95))
+                        drop-shadow(0 0 38px rgba(168, 85, 247, 0.85))
+                        drop-shadow(0 0 50px rgba(236, 72, 153, 0.6))
+                      `,
+                    }}
+                  >
+                    {isWinking ? (
+                      <svg 
+                        width="32" 
+                        height="26" 
+                        viewBox="0 0 32 26" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          d="M5 10C9 18 23 18 27 10" 
+                          stroke="#FFFFFF" 
+                          strokeWidth="6.5" 
+                          strokeLinecap="round" 
+                        />
+                      </svg>
+                    ) : (
+                      <svg 
+                        width="32" 
+                        height="26" 
+                        viewBox="0 0 32 26" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          d="M5.5 21L16 6L26.5 21" 
+                          stroke="#FFFFFF" 
+                          strokeWidth="6.5" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                        />
+                      </svg>
+                    )}
+                  </div>
                 </div>
-
               </div>
-            </div>
 
-            {/* Inner Glass Rim Highlight */}
-            <div className="absolute inset-0 rounded-full border border-white/50 pointer-events-none" />
-          </div>
+              {/* Inner Glass Rim Highlight */}
+              <div 
+                className="absolute inset-0 rounded-full border border-white/50 pointer-events-none transition-opacity duration-200" 
+                style={{ opacity: effectiveListening ? 0.3 : 1 }}
+              />
+            </div>
 
           {/* ================= EXACT METALLIC MAGNIFYING GLASS OVERLAY ================= */}
           <div 
@@ -1099,6 +1439,7 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
             </div>
           </div>
         </div>
+      </div>
 
         {/* Concentric Stage Pedestal & Floor Reflection */}
         {showPedestal && (
@@ -1121,4 +1462,6 @@ export const ExoOrb: React.FC<ExoOrbProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ExoOrb.displayName = 'ExoOrb';

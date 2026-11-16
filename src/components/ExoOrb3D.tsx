@@ -6,15 +6,26 @@ interface ExoOrb3DProps {
   interactive?: boolean;
   onOrbClick?: () => void;
   isJumping?: boolean;
+  isListening?: boolean;
+  listeningVolume?: number;
 }
 
 export const ExoOrb3D: React.FC<ExoOrb3DProps> = ({
   size = 180,
   interactive = true,
   onOrbClick,
+  isListening = false,
+  listeningVolume = 0,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Smooth audio volume ref
+  const audioVolRef = useRef(0);
+  const targetAudioVolRef = useRef(0);
+  targetAudioVolRef.current = isListening ? listeningVolume : 0;
+  const isListeningRef = useRef(isListening);
+  isListeningRef.current = isListening;
 
   // Animation & expression states
   const stateRef = useRef({
@@ -27,6 +38,7 @@ export const ExoOrb3D: React.FC<ExoOrb3DProps> = ({
     blinkScale: 1,
     isWinking: false,
     showBlush: false,
+    isDirty: true,
   });
 
   // Track mouse coordinates for 3D look-at
@@ -56,8 +68,10 @@ export const ExoOrb3D: React.FC<ExoOrb3DProps> = ({
     let blinkTimeout: ReturnType<typeof setTimeout>;
     const blinkInterval = setInterval(() => {
       stateRef.current.blinkScale = 0.08;
+      stateRef.current.isDirty = true;
       blinkTimeout = setTimeout(() => {
         stateRef.current.blinkScale = 1;
+        stateRef.current.isDirty = true;
       }, 160);
     }, 3800);
 
@@ -87,9 +101,11 @@ export const ExoOrb3D: React.FC<ExoOrb3DProps> = ({
       if (!stateRef.current.revolving && Math.random() > 0.45) {
         stateRef.current.isWinking = true;
         stateRef.current.showBlush = true;
+        stateRef.current.isDirty = true;
         setTimeout(() => {
           stateRef.current.isWinking = false;
           stateRef.current.showBlush = false;
+          stateRef.current.isDirty = true;
         }, 1300);
       }
     }, 8500);
@@ -299,9 +315,19 @@ export const ExoOrb3D: React.FC<ExoOrb3DProps> = ({
       sphereMesh.rotation.y = revolveAngle + stateRef.current.currentRotY;
       sphereMesh.rotation.x = stateRef.current.currentRotX;
 
-      // Update face texture
-      drawFace();
-      faceTexture.needsUpdate = true;
+      // Smooth audio pulse lerp (60-144fps, zero jitter)
+      const targetVol = isListeningRef.current ? targetAudioVolRef.current : 0;
+      const rate = targetVol > audioVolRef.current ? 0.22 : 0.09;
+      audioVolRef.current += (targetVol - audioVolRef.current) * rate;
+      const targetScale = 1 + audioVolRef.current * 0.14;
+      sphereMesh.scale.setScalar(targetScale);
+
+      // Only update face texture when facial expression actually changes (avoids 60fps GPU texture re-uploads)
+      if (stateRef.current.isDirty) {
+        drawFace();
+        faceTexture.needsUpdate = true;
+        stateRef.current.isDirty = false;
+      }
 
       renderer.render(scene, camera);
     };

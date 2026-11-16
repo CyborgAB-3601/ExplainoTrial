@@ -38,6 +38,7 @@ import { ExoOrb } from './ExoOrb';
 import { SphericalDotsBackground, VoiceFeedbackStatus } from './SphericalDotsBackground';
 import { useMicrophoneAudio } from '../hooks/useMicrophoneAudio';
 import { useLiveSpeechRecognition } from '../hooks/useLiveSpeechRecognition';
+import orbVoiceBg from '../assets/orb-voice-bg.jpg';
 
 /* ─────────────────────────────────────────────────────────────────
    Simulated transcript phrases
@@ -89,9 +90,13 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
   const [isQuestionDone, setIsQuestionDone] = useState(false);
   const [activeTestIndex, setActiveTestIndex] = useState(0);
   const [isSimulatingVoice, setIsSimulatingVoice] = useState(false);
-  /* Press & Hold Orb State (Walkie-Talkie Push-to-Talk) */
+  /* Press & Hold or Click-to-Listen State */
   const [isHoldingOrb, setIsHoldingOrb] = useState(false);
   const isHoldingOrbRef = useRef(false);
+  const [isClickedListening, setIsClickedListening] = useState(false);
+  const pointerDownTimeRef = useRef(0);
+  const isListeningNow = isHoldingOrb || isClickedListening;
+
   const [isAiEvaluating, setIsAiEvaluating] = useState(false);
   const [aiVoiceReply, setAiVoiceReply] = useState<string | null>(null);
   const [userLastSpoken, setUserLastSpoken] = useState<string | null>(null);
@@ -107,8 +112,8 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     start: retryMic,
   } = useMicrophoneAudio(isMicActive);
 
-  // Web Speech API Transcription: strictly active ONLY after question completes AND while user presses Spacebar or holds the orb!
-  const isSpeechActive = isMicActive && isQuestionDone && isHoldingOrb;
+  // Web Speech API Transcription: active when user holds orb OR clicks listen!
+  const isSpeechActive = isMicActive && (isQuestionDone || isClickedListening) && isListeningNow;
   const {
     interimTranscript,
     finalTranscript,
@@ -119,7 +124,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     isSupported: isSpeechSupported,
   } = useLiveSpeechRecognition(isSpeechActive);
 
-  // Voice level responds strictly when user is holding to speak
+  // Voice level responds strictly when user is holding or clicked to speak
   const effectiveVoiceLevel = isSpeechActive
     ? (isSimulatingVoice ? 0.75 : micVolume)
     : 0;
@@ -198,6 +203,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
       setIsQuestionDone(false);
       setIsHoldingOrb(false);
       isHoldingOrbRef.current = false;
+      setIsClickedListening(false);
       setIsAiEvaluating(false);
       setAiVoiceReply(null);
       setUserLastSpoken(null);
@@ -208,6 +214,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     setIsQuestionDone(false);
     setIsHoldingOrb(false);
     isHoldingOrbRef.current = false;
+    setIsClickedListening(false);
     setIsAiEvaluating(false);
     setAiVoiceReply(null);
     setUserLastSpoken(null);
@@ -410,10 +417,35 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
     }, 950);
   }, [fullTranscript, userSpokenLines, interimTranscript, resetSpeechTranscript, scrollDown]);
 
-  /* ── Orb Press & Release Handlers (Walkie-Talkie Push-to-Talk) ── */
+  /* ── Toggle Click to Listen ──────────────────────────────────── */
+  const handleToggleClickListen = useCallback(() => {
+    if (isClickedListening) {
+      setIsClickedListening(false);
+      handleSendSpokenExplanation();
+    } else {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsQuestionDone(true);
+      setIsAiEvaluating(false);
+      setAiVoiceReply(null);
+      setIsClickedListening(true);
+    }
+  }, [isClickedListening, handleSendSpokenExplanation]);
+
+  /* ── Orb Press & Release Handlers (Supports Quick Tap & Hold-to-Talk) ── */
   const handleOrbPress = useCallback((e?: React.PointerEvent) => {
-    // Only allow listening AFTER the question has completed speaking!
-    if (!isQuestionDone) return;
+    // Only accept primary button (left click / touch)
+    if (e && e.button !== undefined && e.button !== 0) return;
+
+    if (!isQuestionDone) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsQuestionDone(true);
+    }
+
+    pointerDownTimeRef.current = performance.now();
 
     if (e && 'setPointerCapture' in e.currentTarget) {
       try {
@@ -432,42 +464,95 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {}
     }
+
+    // If persistent listening is currently ON, any tap immediately stops and submits
+    if (isClickedListening) {
+      setIsClickedListening(false);
+      isHoldingOrbRef.current = false;
+      setIsHoldingOrb(false);
+      handleSendSpokenExplanation();
+      return;
+    }
+
+    const pressDuration = performance.now() - pointerDownTimeRef.current;
+    
+    // Quick tap (< 250ms) toggles persistent listening mode
+    if (pressDuration < 250) {
+      isHoldingOrbRef.current = false;
+      setIsHoldingOrb(false);
+      handleToggleClickListen();
+      return;
+    }
+
     if (!isHoldingOrbRef.current) return;
     isHoldingOrbRef.current = false;
     setIsHoldingOrb(false);
 
     handleSendSpokenExplanation();
+  }, [isClickedListening, handleSendSpokenExplanation, handleToggleClickListen]);
+
+  const handleOrbLeave = useCallback((e?: React.PointerEvent) => {
+    // If pointer left while holding (e.g. dragged outside without pointer capture),
+    // stop holding without accidentally toggling persistent click listening
+    if (isHoldingOrbRef.current) {
+      isHoldingOrbRef.current = false;
+      setIsHoldingOrb(false);
+      handleSendSpokenExplanation();
+    }
   }, [handleSendSpokenExplanation]);
 
   /* Keyboard Push-to-Talk (Spacebar) */
+  const isSpacePressedRef = useRef(false);
+
   useEffect(() => {
-    if (!isMicActive || !isQuestionDone) return;
+    if (!isMicActive) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && (e.target as HTMLElement)?.tagName !== 'INPUT' && (e.target as HTMLElement)?.tagName !== 'TEXTAREA') {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.code === 'Space') {
         e.preventDefault();
-        if (!isHoldingOrbRef.current) {
-          handleOrbPress();
-        }
+        // Prevent key-repeat from firing continuously and resetting the timer!
+        if (e.repeat || isSpacePressedRef.current) return;
+        isSpacePressedRef.current = true;
+        handleOrbPress();
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && (e.target as HTMLElement)?.tagName !== 'INPUT' && (e.target as HTMLElement)?.tagName !== 'TEXTAREA') {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.code === 'Space') {
         e.preventDefault();
-        if (isHoldingOrbRef.current) {
+        if (isSpacePressedRef.current) {
+          isSpacePressedRef.current = false;
           handleOrbRelease();
         }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    const handleBlur = () => {
+      if (isSpacePressedRef.current) {
+        isSpacePressedRef.current = false;
+        handleOrbRelease();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('keyup', handleKeyUp, { passive: false });
+    window.addEventListener('blur', handleBlur);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
     };
-  }, [isMicActive, isQuestionDone, handleOrbPress, handleOrbRelease]);
+  }, [isMicActive, handleOrbPress, handleOrbRelease]);
 
   const handleCopyText = (id: string, text?: string) => {
     if (!text) return;
@@ -1044,29 +1129,107 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
             style={{
               position: 'absolute', inset: 0, zIndex: 50,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              backgroundColor: '#FFFFFF', // Clean pure white background as requested
-              transition: 'background-color 0.4s ease',
+              backgroundImage: `url(${orbVoiceBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center bottom',
+              backgroundRepeat: 'no-repeat',
               overflowY: 'auto',
               padding: '20px 16px',
             }}
           >
-            {/* 3D Spherical Rotating Dots Canvas */}
-            <SphericalDotsBackground
-              status={voiceFeedback}
-              isSpeaking={isMicActive}
-              audioVolume={effectiveVoiceLevel}
-              listenToMic={false}
-              onStatusReset={handleStatusReset}
-            />
 
             {/* Close button top right */}
             <button
               onClick={() => setIsMicActive(false)}
-              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-white/80 hover:bg-white border border-purple-100 flex items-center justify-center text-gray-500 hover:text-purple-600 shadow-sm transition-all z-20"
+              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-white/80 hover:bg-white border border-purple-100 flex items-center justify-center text-gray-500 hover:text-purple-600 shadow-sm transition-all z-30"
               title="Close Voice Mode"
             >
               <X className="w-4 h-4" />
             </button>
+
+            {/* ════════════════════════════════════════════════════════
+                ALL-CORNER DREAMY BOKEH EFFECT OVERLAY (FOCUS ON ORB)
+            ════════════════════════════════════════════════════════ */}
+            {/* 1. Depth-of-Field Radial Focus Mask (softens periphery, leaves orb luminous & crystal clear) */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at 50% 40%, transparent 26%, rgba(26, 16, 60, 0.1) 55%, rgba(18, 10, 42, 0.32) 100%)',
+                zIndex: 2,
+              }}
+            />
+
+            {/* 2. Top-Left Corner Bokeh Clusters (Lilac, Periwinkle, Celestial Cyan) */}
+            <div className="absolute top-0 left-0 w-80 h-80 pointer-events-none overflow-hidden z-[3]">
+              <div
+                className="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-gradient-to-br from-[#C084FC]/45 via-[#818CF8]/30 to-transparent blur-3xl animate-float"
+                style={{ animationDuration: '6.5s' }}
+              />
+              <div
+                className="absolute top-10 left-16 w-36 h-36 rounded-full bg-gradient-to-tr from-[#38BDF8]/40 to-[#A855F7]/35 blur-2xl animate-float"
+                style={{ animationDuration: '7.8s', animationDelay: '1.2s' }}
+              />
+              <div
+                className="absolute top-24 left-6 w-18 h-18 rounded-full bg-white/55 blur-lg animate-float"
+                style={{ animationDuration: '5.2s', animationDelay: '2.1s' }}
+              />
+              <div
+                className="absolute top-6 left-44 w-12 h-12 rounded-full bg-[#E879F9]/55 blur-md animate-pulse"
+                style={{ animationDuration: '3.4s' }}
+              />
+            </div>
+
+            {/* 3. Top-Right Corner Bokeh Clusters (Golden Dawn, Sunset Coral, Peach) */}
+            <div className="absolute top-0 right-0 w-80 h-80 pointer-events-none overflow-hidden z-[3]">
+              <div
+                className="absolute -top-14 -right-14 w-72 h-72 rounded-full bg-gradient-to-bl from-[#FDBA74]/50 via-[#F472B6]/35 to-transparent blur-3xl animate-float"
+                style={{ animationDuration: '7s', animationDelay: '0.8s' }}
+              />
+              <div
+                className="absolute top-12 right-20 w-40 h-40 rounded-full bg-gradient-to-br from-[#FB7185]/40 to-[#FBBF24]/30 blur-2xl animate-float"
+                style={{ animationDuration: '8.2s', animationDelay: '2s' }}
+              />
+              <div
+                className="absolute top-26 right-8 w-20 h-20 rounded-full bg-[#FFF1F2]/65 blur-lg animate-float"
+                style={{ animationDuration: '5.6s', animationDelay: '1.4s' }}
+              />
+              <div
+                className="absolute top-34 right-48 w-12 h-12 rounded-full bg-[#F472B6]/60 blur-md animate-pulse"
+                style={{ animationDuration: '3.8s' }}
+              />
+            </div>
+
+            {/* 4. Bottom-Left Corner Bokeh Clusters (Deep Twilight Violet & Velvet Indigo) */}
+            <div className="absolute bottom-0 left-0 w-80 h-80 pointer-events-none overflow-hidden z-[3]">
+              <div
+                className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-gradient-to-tr from-[#9333EA]/45 via-[#6366F1]/35 to-transparent blur-3xl animate-float"
+                style={{ animationDuration: '7.5s', animationDelay: '1.6s' }}
+              />
+              <div
+                className="absolute bottom-14 left-20 w-40 h-40 rounded-full bg-gradient-to-tl from-[#C084FC]/40 to-[#38BDF8]/25 blur-2xl animate-float"
+                style={{ animationDuration: '8.8s', animationDelay: '0.5s' }}
+              />
+              <div
+                className="absolute bottom-30 left-8 w-16 h-16 rounded-full bg-white/45 blur-lg animate-float"
+                style={{ animationDuration: '5s', animationDelay: '2.5s' }}
+              />
+            </div>
+
+            {/* 5. Bottom-Right Corner Bokeh Clusters (Warm Amber, Peach Glow, Sunset Rose) */}
+            <div className="absolute bottom-0 right-0 w-80 h-80 pointer-events-none overflow-hidden z-[3]">
+              <div
+                className="absolute -bottom-16 -right-16 w-76 h-76 rounded-full bg-gradient-to-tl from-[#F472B6]/45 via-[#FB923C]/35 to-transparent blur-3xl animate-float"
+                style={{ animationDuration: '7.2s', animationDelay: '2.2s' }}
+              />
+              <div
+                className="absolute bottom-14 right-20 w-40 h-40 rounded-full bg-gradient-to-tr from-[#E879F9]/40 to-[#FDBA74]/30 blur-2xl animate-float"
+                style={{ animationDuration: '8.4s', animationDelay: '1.2s' }}
+              />
+              <div
+                className="absolute bottom-30 right-12 w-18 h-18 rounded-full bg-white/50 blur-lg animate-float"
+                style={{ animationDuration: '5.4s', animationDelay: '0.9s' }}
+              />
+            </div>
 
             {/* Content card — clean unboxed before UI */}
             <div
@@ -1098,62 +1261,26 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                     userSelect: 'none',
                     WebkitUserSelect: 'none',
                     touchAction: 'none',
-                    transform: `scale(${1 + (isVoiceActive ? effectiveVoiceLevel * 0.08 : isOrbHovered ? 0.03 : 0)})`,
-                    transition: 'transform 0.08s ease-out',
+                    transform: isOrbHovered && !isVoiceActive ? 'scale(1.03)' : 'scale(1)',
+                    transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
                     willChange: 'transform',
                   }}
                   onMouseEnter={() => setIsOrbHovered(true)}
                   onMouseLeave={() => setIsOrbHovered(false)}
-                  onPointerDown={handleOrbPress}
-                  onPointerUp={handleOrbRelease}
-                  onPointerLeave={handleOrbRelease}
-                  onPointerCancel={handleOrbRelease}
                   title={isQuestionDone ? 'Hold orb or Spacebar to speak' : 'EXO is speaking the question...'}
                 >
-                  {/* Dynamic Glow Halo reacting smoothly to voice without lag */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: -28,
-                      borderRadius: '50%',
-                      background: 'radial-gradient(circle, rgba(168,85,247,0.42) 0%, rgba(236,72,153,0.22) 45%, transparent 70%)',
-                      opacity: isVoiceActive ? 0.75 + effectiveVoiceLevel * 0.35 : 0.35,
-                      transform: `scale(${isVoiceActive ? 1.1 + effectiveVoiceLevel * 0.22 : 1})`,
-                      transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-                      willChange: 'transform, opacity',
-                      pointerEvents: 'none',
-                    }}
-                  />
-
                   <ExoOrb
                     size="md"
                     showPedestal={false}
-                    isListening={isVoiceActive}
+                    isListening={Boolean(isVoiceActive || isListeningNow)}
                     listeningVolume={effectiveVoiceLevel}
-                    showSpeechBubble={Boolean(isVoiceActive || isAiEvaluating || aiVoiceReply)}
-                    speechBubbleTitle={
-                      isAiEvaluating
-                        ? 'Evaluating'
-                        : isVoiceActive
-                        ? 'Listening'
-                        : !isQuestionDone
-                        ? 'Question'
-                        : 'Ready'
-                    }
-                    speechBubbleSubtitle={
-                      isAiEvaluating
-                        ? 'AI thinking...'
-                        : isVoiceActive
-                        ? 'Listening to you...'
-                        : !isQuestionDone
-                        ? 'Listen closely'
-                        : 'Hold orb or Spacebar'
-                    }
-                    speechBubbleEmoji={
-                      isAiEvaluating ? '✨' : isVoiceActive ? '🎙️' : !isQuestionDone ? '🔊' : '🌿'
-                    }
+                    showSpeechBubble={false}
                     subLabel=""
-                    interactive={!isVoiceActive}
+                    interactive={!(isVoiceActive || isListeningNow)}
+                    onPointerDown={handleOrbPress}
+                    onPointerUp={handleOrbRelease}
+                    onPointerLeave={handleOrbLeave}
+                    onPointerCancel={handleOrbRelease}
                     className="!my-0"
                   />
                 </div>
@@ -1261,35 +1388,102 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                       </div>
                     </div>
                   ) : (
-                    /* ── Clean Voice UI: Soundwave indicator without live text clutter ── */
-                    <div className="flex flex-col items-center justify-center py-2 text-center select-none animate-in fade-in duration-150" style={{ position: 'relative', zIndex: 20, marginTop: 16 }}>
-                      {isHoldingOrb ? (
-                        /* Soundwave Equalizer while holding to speak - NO live text transcription */
-                        <div className="flex flex-col items-center justify-center py-2 gap-2.5 animate-in zoom-in-95 duration-150">
-                          <div className="flex items-center gap-1.5 h-6">
-                            {[0.4, 0.7, 1.0, 0.7, 0.4].map((h, idx) => (
-                              <span
-                                key={idx}
-                                className="w-1.5 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full transition-all duration-75"
-                                style={{
-                                  height: Math.max(6, Math.round((h * 24) * (0.3 + effectiveVoiceLevel * 0.7))),
-                                  opacity: 0.6 + effectiveVoiceLevel * 0.4,
-                                }}
-                              />
-                            ))}
+                    /* ── Clean Voice UI: Audio Visualizer Dock showing user speech level neatly ── */
+                    <div className="flex flex-col items-center justify-center py-2 text-center select-none animate-in fade-in duration-200" style={{ position: 'relative', zIndex: 20, marginTop: 12 }}>
+                      {isListeningNow ? (
+                        /* Modern Glassmorphic Audio Spectrum Visualizer Dock */
+                        <div
+                          className="flex items-center justify-between gap-3 sm:gap-4 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/80 hover:bg-white/90 backdrop-blur-2xl border border-white/85 shadow-[0_8px_30px_rgba(168,85,247,0.16),0_1px_3px_rgba(0,0,0,0.04)] transition-all max-w-lg w-full animate-in zoom-in-95 duration-200"
+                        >
+                          {/* Live Listening Status: EXACT same typography as before holding */}
+                          <div className="flex items-center gap-2.5 shrink-0">
+                            <span className="relative flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-tr from-purple-600 to-pink-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                            </span>
+                            <span className="text-xs sm:text-[13px] font-semibold text-purple-900 flex items-center gap-1.5">
+                              <span className="font-bold">Listening</span>
+                              <span className="text-purple-300">•</span>
+                              <span className="text-purple-600/90 font-medium text-xs sm:text-[12px]">
+                                {isHoldingOrb ? 'Release Spacebar to finish' : 'Click Finish when done'}
+                              </span>
+                              {isHoldingOrb && (
+                                <>
+                                  <span className="text-purple-300">•</span>
+                                  <span className="text-purple-600/90 font-medium text-xs sm:text-[12px]">
+                                    Release Spacebar to finish
+                                  </span>
+                                </>
+                              )}
+                            </span>
                           </div>
-                          <p className="text-xs font-bold text-purple-700 tracking-wide uppercase">
-                            Listening... Release to send ✨
-                          </p>
+
+                          {/* Dynamic 16-Bar Voice Reacting Clean Waveform neatly merged in pill */}
+                          <div className="flex items-center justify-center gap-[3px] sm:gap-[4px] h-7 flex-1 max-w-[130px] sm:max-w-[170px] mx-1 overflow-hidden">
+                            {[
+                              0.28, 0.44, 0.62, 0.82, 0.94, 1.0, 0.96, 0.84, 
+                              0.84, 0.96, 1.0, 0.94, 0.82, 0.62, 0.44, 0.28
+                            ].map((scaleFactor, idx) => {
+                              const isCenter = idx >= 4 && idx <= 11;
+                              const idleHeight = 3.5 + Math.sin((idx / 15) * Math.PI) * 2.5;
+                              const voiceBoost = scaleFactor * (effectiveVoiceLevel * 19);
+                              const barHeight = Math.max(3.5, Math.min(24, Math.round(idleHeight + voiceBoost)));
+                              const barOpacity = Math.min(1, 0.55 + effectiveVoiceLevel * 0.45);
+
+                              return (
+                                <span
+                                  key={idx}
+                                  className={`w-[2.5px] sm:w-[3px] rounded-full transition-all duration-100 ease-out ${
+                                    isCenter
+                                      ? 'bg-gradient-to-t from-[#7C5CFF] via-[#A855F7] to-[#EC4899]'
+                                      : 'bg-gradient-to-t from-[#6366F1] via-[#818CF8] to-[#C084FC]'
+                                  }`}
+                                  style={{
+                                    height: `${barHeight}px`,
+                                    opacity: barOpacity,
+                                    animation: effectiveVoiceLevel < 0.05
+                                      ? 'modernWaveIdle 1.5s ease-in-out infinite'
+                                      : undefined,
+                                    animationDelay: `${(idx % 4) * 0.18}s`,
+                                    filter: isCenter && effectiveVoiceLevel > 0.12
+                                      ? 'drop-shadow(0 0 3px rgba(236, 72, 153, 0.45))'
+                                      : undefined,
+                                  }}
+                                />
+                              );
+                            })}
+                          </div>
+
+                          {/* Compact Finish Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isClickedListening) {
+                                handleToggleClickListen();
+                              } else {
+                                handleOrbRelease();
+                              }
+                            }}
+                            className="shrink-0 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs font-bold shadow-[0_2px_8px_rgba(124,92,255,0.28)] transition-all cursor-pointer"
+                          >
+                            <span>Finish</span>
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       ) : (
-                        /* Idle status */
-                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50/80 border border-purple-200/60 shadow-xs">
-                          <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
-                          <span className="text-xs font-semibold text-purple-900">
-                            Hold orb or press Spacebar to speak
+                        /* Idle status / Click to Listen Pill matching cosmic UI */
+                        <button
+                          type="button"
+                          onClick={handleToggleClickListen}
+                          className="flex items-center gap-2.5 px-6 py-2.5 sm:py-3 rounded-full bg-white/75 hover:bg-white/90 backdrop-blur-2xl border border-white/80 shadow-[0_6px_24px_rgba(168,85,247,0.12)] hover:shadow-[0_8px_30px_rgba(168,85,247,0.22)] hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+                        >
+                          <span className="w-2 h-2 rounded-full bg-purple-500 group-hover:scale-125 transition-transform animate-ping" />
+                          <span className="text-xs sm:text-[13px] font-semibold text-purple-900 flex items-center gap-1.5">
+                            <span className="font-bold">Hold orb or press Spacebar to speak</span>
+                            <span className="text-purple-300">•</span>
+                            <span className="text-purple-600 font-semibold underline decoration-purple-300 underline-offset-2">or Click to Listen</span>
                           </span>
-                        </div>
+                        </button>
                       )}
                     </div>
                   )}

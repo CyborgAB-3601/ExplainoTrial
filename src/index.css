@@ -177,6 +177,17 @@
   }
 }
 
+@keyframes modernWaveIdle {
+  0%, 100% {
+    transform: scaleY(0.65);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1.35);
+    opacity: 0.88;
+  }
+}
+
 .animate-orb-float {
   animation: orbFloat 4.5s ease-in-out infinite;
 }
@@ -445,5 +456,173 @@
     opacity: 0;
   }
 }
+
+/* 6. ExoOrb Wide Ear Listening & Sonar Waves */
+@keyframes sonarPulse {
+  0% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0.15;
+    transform: scale(1.32);
+  }
+}
+
+@keyframes earLendTilt {
+  0%, 100% {
+    transform: rotate(14deg) scale(1.38);
+  }
+  50% {
+    transform: rotate(16deg) scale(1.41);
+  }
+}
+
+@keyframes spinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* 7. ExoOrb Fluid Listening Morph & Organic Jelly Waves (GPU Composited) */
+@keyframes fluidOrbMorph {
+  0%, 100% {
+    transform: scale(1, 1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.022, 0.982) rotate(1deg);
+  }
+  50% {
+    transform: scale(0.985, 1.02) rotate(-0.8deg);
+  }
+  75% {
+    transform: scale(1.018, 0.988) rotate(0.6deg);
+  }
+}
+
+@keyframes fluidAuraPulse {
+  0%, 100% {
+    transform: scale(1.12);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.24);
+    opacity: 0.98;
+  }
+}
+
+@keyframes listeningEyeBreathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.94;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+/* 8. Purple Organic Orb Melt, Plunge & Giant Half-Head Peep Keyframes */
+@keyframes orbSagMelt {
+  0% {
+    transform: translateY(0) scale(1, 1);
+    border-radius: 50%;
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(22px) scale(0.88, 1.28);
+    border-radius: 46% 46% 65% 65% / 40% 40% 85% 85%;
+  }
+  75% {
+    transform: translateY(54px) scale(0.78, 1.6);
+    border-radius: 38% 38% 75% 75% / 28% 28% 95% 95%;
+  }
+  100% {
+    transform: translateY(110px) scale(0.65, 1.8);
+    opacity: 0.85;
+  }
+}
+
+@keyframes orbPlungeDown {
+  0% {
+    transform: translateY(0) scale(0.68, 1.6);
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(48vh) scale(0.85, 1.7);
+    opacity: 0.9;
+  }
+}
+
+@keyframes bottomPuddleSpread {
+  0% {
+    transform: scaleX(0.2) scaleY(0.3);
+    opacity: 0;
+  }
+  45% {
+    transform: scaleX(1.18) scaleY(1.08);
+    opacity: 1;
+  }
+  75% {
+    transform: scaleX(0.96) scaleY(0.92);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bigHalfHeadPeep {
+  0% {
+    transform: translateY(115%) scale(0.7, 0.4);
+    opacity: 0;
+  }
+  58% {
+    transform: translateY(-16px) scale(1.06, 1.03);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(6px) scale(0.98, 0.99);
+  }
+  100% {
+    transform: translateY(0%) scale(1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes bigHalfHeadBreathe {
+  0%, 100% {
+    transform: translateY(0%) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02, 1.01);
+  }
+}
+
+@keyframes bigAcousticWaves {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+
 
 

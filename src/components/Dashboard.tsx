@@ -39,6 +39,7 @@ import { LearnPage } from './LearnPage';
 import { HeroSlider } from './HeroSlider';
 import { ArcadeCabinet3D } from './ArcadeCabinet3D';
 import { ArcadePage } from './ArcadePage';
+import { HomePage } from '../Home';
 import bgImage from '../assets/bg.png';
 
 interface DashboardProps {
@@ -244,6 +245,54 @@ export const Dashboard: React.FC<DashboardProps> = ({
       setExoMessage("Ask a question, explain a concept, or get help with your doubts.");
     }, 4000);
   };
+
+  // Fullscreen voice/concept session
+  if (showChatSession) {
+    return (
+      <div className="fixed inset-0 z-50">
+        <ChatSession
+          userName={userName}
+          initialTopic={sessionTopic}
+          onBackToDashboard={() => {
+            setShowChatSession(false);
+            setIsTransitioning(false);
+            window.scrollTo(0, 0);
+          }}
+        />
+        {isTransitioning && (
+          <ExoTransitionOverlay
+            topic={sessionTopic}
+            onComplete={() => {
+              setIsTransitioning(false);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Kando Radial Menu Home Screen (with ExoOrb in center)
+  if (activeNav === 'Home') {
+    return (
+      <>
+        <HomePage
+          userName={userName}
+          onStartSession={handleStartSession}
+          onNavigateToLearn={() => setActiveNav('Learn')}
+          onNavigateToExplore={() => setActiveNav('Explore')}
+          onLogout={onLogout}
+        />
+        {isTransitioning && (
+          <ExoTransitionOverlay
+            topic={sessionTopic}
+            onComplete={() => {
+              setIsTransitioning(false);
+            }}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <div className={`relative ${

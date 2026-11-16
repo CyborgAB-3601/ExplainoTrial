@@ -31,8 +31,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
           </div>
-          <span className="text-xl font-extrabold tracking-wide text-[#1E1B2E] font-sans">
-            EXPLAINO
+          <span className="text-xl font-extrabold tracking-wide text-[#1E1926] font-sans">
+            NILO
           </span>
         </div>
 
