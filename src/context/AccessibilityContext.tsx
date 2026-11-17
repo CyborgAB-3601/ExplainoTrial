@@ -32,6 +32,8 @@ interface AccessibilityContextType {
   isMenuOpen: boolean;
   isSpeaking: boolean;
   activeCount: number;
+  aslContext?: { equation?: string; activeStepTitle?: string };
+  setAslContext: (ctx: { equation?: string; activeStepTitle?: string }) => void;
   setIsMenuOpen: (open: boolean | ((prev: boolean) => boolean)) => void;
   toggleMenu: () => void;
   setBrailleSupport: (val: boolean) => void;
@@ -90,6 +92,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mousePos, setMousePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [aslContext, setAslContext] = useState<{ equation?: string; activeStepTitle?: string } | undefined>(undefined);
 
   // Save changes to localStorage
   useEffect(() => {
@@ -428,6 +431,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         isMenuOpen,
         isSpeaking,
         activeCount,
+        aslContext,
+        setAslContext,
         setIsMenuOpen,
         toggleMenu,
         setBrailleSupport,
@@ -583,7 +588,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       {settings.aslSupport && (
         <DraggableASLWindow
           onClose={() => setAslSupport(false)}
-          currentEquation="2x + 5 = 15"
+          currentEquation={aslContext?.equation || '2x + 5 = 15'}
+          activeStepTitle={aslContext?.activeStepTitle || 'Subtract 5 from both sides to isolate 2x'}
         />
       )}
     </AccessibilityContext.Provider>
