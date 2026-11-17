@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Target, Gamepad2, Box } from 'lucide-react';
 import { ArcadeCabinet3D } from '../components/ArcadeCabinet3D';
 import { ArcadePage } from '../components/ArcadePage';
+import { TrajectoryTitanGame } from './TrajectoryTitanGame';
 
 export interface GamesViewProps {
   onBack?: () => void;
@@ -12,12 +13,12 @@ export const GamesView: React.FC<GamesViewProps> = ({
   onBack,
   className = '',
 }) => {
-  const [viewMode, setViewMode] = useState<'3d_cabinet' | 'arcade_page'>('3d_cabinet');
+  const [viewMode, setViewMode] = useState<'arcade_page' | '3d_cabinet'>('arcade_page');
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col bg-[#0A0B1A] text-white font-sans ${className}`}>
-      {/* ── Top Header Bar with Menu Center / Back to Wheel ── */}
-      <header className="h-12 px-4 bg-black/70 border-b border-purple-900/40 flex items-center justify-between shrink-0 z-50 backdrop-blur-md">
+      {/* ── Top Header Bar with Menu Center / Back to Wheel & Game Mode Switcher ── */}
+      <header className="h-12 px-4 bg-black/75 border-b border-purple-900/40 flex items-center justify-between shrink-0 z-50 backdrop-blur-md">
         <button
           onClick={onBack}
           className="px-3 py-1 rounded-full bg-[#FAF2F6] hover:bg-[#F4E3ED] border border-[#8E2856]/20 text-[#8E2856] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
@@ -31,22 +32,35 @@ export const GamesView: React.FC<GamesViewProps> = ({
           <span>Menu center</span>
         </button>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-extrabold tracking-wider text-purple-300 uppercase">
-            Nilo Concept Arcade
-          </span>
-          {viewMode === 'arcade_page' && (
-            <button
-              onClick={() => setViewMode('3d_cabinet')}
-              className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold transition-colors cursor-pointer"
-            >
-              View 3D Cabinet
-            </button>
-          )}
+        {/* View Switcher: Arcade Catalog | 3D Cabinet */}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white/10 border border-white/10">
+          <button
+            onClick={() => setViewMode('arcade_page')}
+            className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              viewMode === 'arcade_page'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+            <span>Arcade Catalog</span>
+          </button>
+
+          <button
+            onClick={() => setViewMode('3d_cabinet')}
+            className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              viewMode === '3d_cabinet'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            <Box className="w-3.5 h-3.5" />
+            <span>3D Cabinet</span>
+          </button>
         </div>
       </header>
 
-      {/* ── 3D Arcade Screen vs Arcade Page ── */}
+      {/* ── Active Game Stage ── */}
       <div className="flex-1 overflow-hidden relative">
         {viewMode === '3d_cabinet' ? (
           <ArcadeCabinet3D

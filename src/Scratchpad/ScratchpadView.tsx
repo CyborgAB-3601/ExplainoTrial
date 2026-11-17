@@ -23,6 +23,9 @@ import {
   Send,
   ArrowLeft
 } from 'lucide-react';
+import { useAccessibility } from '../context/AccessibilityContext';
+import { AccessibilityMenu } from '../components/AccessibilityMenu';
+import { AccessibilityIcon } from '../components/AccessibilityIcon';
 
 export interface ScratchpadViewProps {
   onBack?: () => void;
@@ -33,6 +36,9 @@ export const ScratchpadView: React.FC<ScratchpadViewProps> = ({
   onBack,
   className = '',
 }) => {
+  // Accessibility state
+  const { isMenuOpen, toggleMenu, setIsMenuOpen } = useAccessibility();
+
   // Canvas states
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [activeTool, setActiveTool] = useState<'pen' | 'eraser' | 'select' | 'shape' | 'grid'>('pen');
@@ -298,13 +304,37 @@ export const ScratchpadView: React.FC<ScratchpadViewProps> = ({
           <div className="w-5 h-[1px] bg-slate-200/80 my-1" />
 
           {/* Left Vertical Action Icons */}
-          <button className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer">
+          <button
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+            title="Favorites"
+          >
             <Heart className="w-4 h-4" />
           </button>
-          <button className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer">
+          <button
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer"
+            title="Stickers"
+          >
             <Smile className="w-4 h-4" />
           </button>
-          <button className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-purple-600 hover:bg-white/80 transition-all cursor-pointer">
+
+          {/* Accessibility Option - Just above + */}
+          <button
+            onClick={toggleMenu}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+              isMenuOpen
+                ? 'bg-[#8E2856] text-white shadow-sm ring-2 ring-[#8E2856]/30'
+                : 'text-slate-500 hover:text-[#8E2856] hover:bg-white/80'
+            }`}
+            title="Accessibility Options"
+            aria-label="Accessibility Options"
+          >
+            <AccessibilityIcon className="w-4 h-4" />
+          </button>
+
+          <button
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-purple-600 hover:bg-white/80 transition-all cursor-pointer"
+            title="New Canvas"
+          >
             <Plus className="w-4 h-4" />
           </button>
         </div>
@@ -318,6 +348,16 @@ export const ScratchpadView: React.FC<ScratchpadViewProps> = ({
           <X className="w-4 h-4" />
         </button>
       </aside>
+
+      {/* =========================================================================
+          NEXT MENU: ACCESSIBILITY OPTIONS (Opens adjacent to the leftmost menu)
+         ========================================================================= */}
+      {isMenuOpen && (
+        <AccessibilityMenu
+          onClose={() => setIsMenuOpen(false)}
+          onReadAloudCustomText="Math Sandbox: Solving linear equations. Current equation on board: 2x plus 5 equals 15. Hint: To isolate 2x, try to get rid of plus 5 first by subtracting 5 from both sides, which gives 2x equals 10. Then divide both sides by 2 to find x equals 5."
+        />
+      )}
 
       {/* =========================================================================
           2. MAIN CONTENT AREA (TOP BAR + CANVAS + RIGHT CHAT PANEL)

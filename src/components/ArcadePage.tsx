@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { arcadeAudio } from '../utils/arcadeAudio';
 import { GeometryDashMathGame } from './GeometryDashMathGame';
+import { TrajectoryTitanGame } from '../Games/TrajectoryTitanGame';
 import {
   Gamepad2,
   Play,
@@ -295,6 +296,23 @@ const GAMES_DATA: GameItem[] = [
   },
 
   // Physics Games
+  {
+    id: 'physics-projectile',
+    title: 'Trajectory Titan : Slingshot',
+    subtitle: 'Kinematics & Parabolic Slingshot',
+    category: 'Physics',
+    coverImg: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=900',
+    trailerImg: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&q=80&w=900',
+    about: 'Master projectile motion using authentic kinematics formulas! Slingshot physics cores at exact launch angles (45° max range, 30°/60° complementary angles) and tune launch power to smash destructible timber, glass, and stone citadels.',
+    ratings: {
+      starGame: 9.8,
+      metacritic: 96,
+      userAvg: 9.7
+    },
+    level: 'Lv. 45',
+    badge: 'FEATURED PHYSICS',
+    topic: 'Projectile Motion, 45° Range & Apex Height'
+  },
   {
     id: 'physics-odyssey',
     title: "Newton's Relic : Gravity & Optics",
@@ -655,6 +673,57 @@ export const ArcadePage: React.FC<ArcadePageProps> = ({
             ref={categoriesRef}
             className="flex items-center gap-4 sm:gap-5 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 py-3 -mx-4"
           >
+            {/* Card 0: Physics (Electric Blue & Amber Gradient + 3D Parabolic Trajectory Art) */}
+            <div
+              onClick={() => handleSelectCategory('Physics')}
+              className={`min-w-[230px] sm:min-w-[260px] h-36 sm:h-40 rounded-3xl p-5 relative overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-lg flex flex-col justify-between shrink-0 ${
+                activeCategory.toLowerCase() === 'physics'
+                  ? 'border-2 border-white/90 shadow-[0_0_30px_rgba(59,130,246,0.55)]'
+                  : 'border-2 border-transparent'
+              }`}
+              style={{
+                background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #0D9488 100%)',
+              }}
+            >
+              {/* Play Button Icon */}
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const firstPhys = GAMES_DATA.find((g) => g.category.toLowerCase() === 'physics');
+                  if (firstPhys) handleSelectGame(firstPhys);
+                }}
+                className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-md text-[#2563EB] transition-transform hover:scale-110 cursor-pointer"
+                title="Play Physics"
+              >
+                <Play className="w-4 h-4 fill-current ml-0.5" />
+              </div>
+
+              {/* Title & Player Count */}
+              <div className="relative z-10 text-white">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg sm:text-xl font-black tracking-tight drop-shadow-sm">Physics</h3>
+                  <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-amber-950">NEW</span>
+                </div>
+                <p className="text-xs text-white/90 font-medium">62,480 Playing</p>
+              </div>
+
+              {/* 3D Stylized Parabolic Trajectory Art */}
+              <div className="absolute -right-2 -bottom-2 w-32 h-32 pointer-events-none drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
+                <svg viewBox="0 0 100 100" fill="none" className="w-full h-full transform rotate-[5deg]">
+                  {/* Dotted Trajectory Arc */}
+                  <path d="M 10 90 Q 45 10 90 75" stroke="#FFFFFF" strokeWidth="3.5" strokeDasharray="5 4" opacity="0.9" />
+                  {/* Launch anchor */}
+                  <circle cx="10" cy="90" r="5" fill="#FBBF24" />
+                  {/* Apex height point */}
+                  <circle cx="45" cy="38" r="6" fill="#38BDF8" />
+                  <path d="M 45 32 L 53 42 L 37 42 Z" fill="#F43F5E" />
+                  {/* Landing impact */}
+                  <circle cx="90" cy="75" r="7" fill="#34D399" />
+                  <circle cx="90" cy="75" r="12" stroke="#34D399" strokeWidth="1.5" opacity="0.6" strokeDasharray="3 3" />
+                </svg>
+              </div>
+            </div>
+
             {/* Card 1: Maths (Vibrant Rose/Pink Gradient + 3D Math Art) */}
             <div
               onClick={() => handleSelectCategory('Math')}
@@ -1283,9 +1352,16 @@ export const ArcadePage: React.FC<ArcadePageProps> = ({
         </div>
       )}
 
-      {/* ================= 3D GEOMETRY DASH MATH HIGHWAY RUNNER GAME ================= */}
+      {/* ================= 3D GEOMETRY DASH MATH / KINEMATICS SLINGSHOT ================= */}
       {activeGameToPlay && (() => {
         const gameObj = GAMES_DATA.find((g) => g.id === activeGameToPlay) || selectedGame;
+        if (activeGameToPlay === 'physics-projectile' || activeGameToPlay === 'physics-odyssey' || gameObj?.category === 'Physics') {
+          return (
+            <TrajectoryTitanGame
+              onBack={() => setActiveGameToPlay(null)}
+            />
+          );
+        }
         return (
           <GeometryDashMathGame
             onExit={() => setActiveGameToPlay(null)}

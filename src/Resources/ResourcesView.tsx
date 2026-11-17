@@ -19,6 +19,9 @@ import {
   BookOpen
 } from 'lucide-react';
 import { LearnPage } from '../components/LearnPage';
+import { useAccessibility } from '../context/AccessibilityContext';
+import { AccessibilityMenu } from '../components/AccessibilityMenu';
+import { AccessibilityIcon } from '../components/AccessibilityIcon';
 
 export interface ResourcesViewProps {
   onBack?: () => void;
@@ -31,6 +34,8 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
   onSelectTopic,
   className = '',
 }) => {
+  const { isMenuOpen, toggleMenu, setIsMenuOpen } = useAccessibility();
+
   return (
     <div
       className={`fixed inset-0 w-screen h-screen overflow-hidden select-none text-[#2C2936] font-sans flex ${className}`}
@@ -68,6 +73,21 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
           <button className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all cursor-pointer">
             <Smile className="w-4 h-4" />
           </button>
+
+          {/* Accessibility Option - Just above + */}
+          <button
+            onClick={toggleMenu}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+              isMenuOpen
+                ? 'bg-[#8E2856] text-white shadow-sm ring-2 ring-[#8E2856]/30'
+                : 'text-slate-500 hover:text-[#8E2856] hover:bg-white/80'
+            }`}
+            title="Accessibility Options"
+            aria-label="Accessibility Options"
+          >
+            <AccessibilityIcon className="w-4 h-4" />
+          </button>
+
           <button className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-purple-600 hover:bg-white/80 transition-all cursor-pointer">
             <Plus className="w-4 h-4" />
           </button>
@@ -82,6 +102,16 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
           <X className="w-4 h-4" />
         </button>
       </aside>
+
+      {/* =========================================================================
+          NEXT MENU: ACCESSIBILITY OPTIONS (Opens adjacent to the leftmost rail)
+         ========================================================================= */}
+      {isMenuOpen && (
+        <AccessibilityMenu
+          onClose={() => setIsMenuOpen(false)}
+          onReadAloudCustomText="Study Guides and Resources library. Browse interactive 3D books covering Linear Equations, Cellular Biology, Wave Optics, and Chemical Kinetics."
+        />
+      )}
 
       {/* =========================================================================
           2. MAIN CONTENT AREA (TOP HEADER + 3D INTERACTIVE BOOK LIBRARY)

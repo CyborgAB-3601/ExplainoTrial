@@ -21,10 +21,13 @@
    - The project uses **React 19**, **TypeScript 5/6**, **Vite 8**, **Tailwind CSS 3.4**, and **`lucide-react`** (`^1.48.0`), plus **`three`**.
    - **DO NOT** install additional npm packages (`npm i`). Use native HTML5 Canvas 2D, SVG, Web Audio API, and Tailwind CSS for custom visuals, diagrams, and interactions.
 
-3. **Export Contract:**
+3. **Persistent Session & Navigation Rule:**
+   - Once a student logs in, clicking "Home", the Nilo logo, or "Menu center" returns them to the active **Dashboard / Radial Stage**, and must **NEVER trigger a logout**. Logouts only occur via the explicit "Log out / Exit" button.
+
+4. **Export Contract:**
    - Every module must maintain its clean export in `src/<ModuleFolder>/index.ts` conforming to the existing TypeScript props.
 
-4. **Zero-Scrollbar & Clean Design Rule:**
+5. **Zero-Scrollbar & Clean Design Rule:**
    - All scrollable containers must use hidden scrollbars (`[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden`).
    - UI selection must be controlled (`select-none` on UI containers, selectable on code/text).
 

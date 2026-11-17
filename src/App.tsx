@@ -6,9 +6,11 @@ import { BackgroundWaves } from './components/BackgroundWaves';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { X, Play, CheckCircle2 } from 'lucide-react';
+import { AccessibilityProvider } from './context/AccessibilityContext';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'hero' | 'auth' | 'dashboard'>('hero');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'signup'>('login');
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string }>({
     name: 'Abhinav',
@@ -30,6 +32,7 @@ export default function App() {
   };
 
   const handleLoginSuccess = (user: { name?: string; email: string }) => {
+    setIsLoggedIn(true);
     setCurrentUser({
       name: user.name || 'Abhinav',
       email: user.email,
@@ -40,8 +43,17 @@ export default function App() {
     }, 800);
   };
 
+  const handleHomeNavigation = () => {
+    if (isLoggedIn) {
+      setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('hero');
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-[#F8F7FD] overflow-hidden flex flex-col font-sans selection:bg-[#7C5CFF]/20 selection:text-[#1E1B2E]">
+    <AccessibilityProvider>
+      <div className="relative min-h-screen bg-[#F8F7FD] overflow-hidden flex flex-col font-sans selection:bg-[#7C5CFF]/20 selection:text-[#1E1B2E]">
 
       {/* ============= 1. HERO MARKETING PAGE ============= */}
       {currentPage === 'hero' && (
@@ -51,12 +63,18 @@ export default function App() {
             <Navbar
               currentPage="home"
               onLoginClick={() => openAuth('login')}
-              onHomeClick={() => setCurrentPage('hero')}
+              onHomeClick={handleHomeNavigation}
             />
           </div>
           <main className="relative z-10 flex-1 flex flex-col">
             <Hero
-              onStartLearning={() => openAuth('signup')}
+              onStartLearning={() => {
+                if (isLoggedIn) {
+                  setCurrentPage('dashboard');
+                } else {
+                  openAuth('signup');
+                }
+              }}
               onWatchDemo={() => setShowDemoModal(true)}
             />
             <FeaturesGrid />
@@ -71,7 +89,7 @@ export default function App() {
           <main className="relative z-20 flex-1 flex flex-col">
             <LoginPage
               initialMode={authInitialMode}
-              onHomeClick={() => setCurrentPage('hero')}
+              onHomeClick={handleHomeNavigation}
               onSuccessAuth={handleLoginSuccess}
             />
           </main>
@@ -83,6 +101,7 @@ export default function App() {
         <Dashboard
           userName={currentUser.name}
           onLogout={() => {
+            setIsLoggedIn(false);
             triggerToast("Logged out successfully.");
             setCurrentPage('hero');
           }}
@@ -139,6 +158,7 @@ export default function App() {
         </div>
       )}
 
-    </div>
+      </div>
+    </AccessibilityProvider>
   );
 }
