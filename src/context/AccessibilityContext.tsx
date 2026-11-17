@@ -14,6 +14,7 @@ export interface AccessibilitySettings {
   brailleSupport: boolean;
   aslSupport: boolean;
   readingRuler: boolean;
+  screenNarrator: boolean;
   highContrast: HighContrastMode;
   fontSize: FontSizeScale;
   dyslexicFont: boolean;
@@ -35,6 +36,8 @@ interface AccessibilityContextType {
   toggleMenu: () => void;
   setBrailleSupport: (val: boolean) => void;
   setAslSupport: (val: boolean) => void;
+  setScreenNarrator: (val: boolean) => void;
+  toggleScreenNarrator: () => void;
   setHighContrast: (mode: HighContrastMode) => void;
   setFontSize: (size: FontSizeScale) => void;
   setDyslexicFont: (val: boolean) => void;
@@ -56,6 +59,7 @@ const defaultSettings: AccessibilitySettings = {
   brailleSupport: false,
   aslSupport: false,
   readingRuler: false,
+  screenNarrator: false,
   highContrast: 'off',
   fontSize: 100,
   dyslexicFont: false,
@@ -134,6 +138,106 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [settings.fontSize, settings.reduceMotion, settings.dyslexicFont, settings.lineSpacing]);
 
+  // Screen Narrator: Reads aloud when hovering over elements or highlighting text
+  const lastSpokenRef = useRef<string>('');
+  const hoverTimerRef = useRef<number | null>(null);
+  const currentHighlightedElRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!settings.screenNarrator) {
+      if (currentHighlightedElRef.current) {
+        currentHighlightedElRef.current.classList.remove('screen-narrator-highlight');
+        currentHighlightedElRef.current = null;
+      }
+      stopSpeaking();
+      return;
+    }
+
+    const extractReadableText = (el: HTMLElement | null): string => {
+      if (!el || el === document.body || el === document.documentElement) return '';
+      // Don't read raw controls inside the accessibility menu itself
+      if (el.closest('[aria-label="Accessibility Settings Menu"]')) return '';
+
+      const ariaLabel = el.getAttribute('aria-label');
+      if (ariaLabel?.trim()) return ariaLabel.trim();
+
+      const title = el.getAttribute('title');
+      if (title?.trim()) return title.trim();
+
+      const alt = el.getAttribute('alt');
+      if (alt?.trim()) return alt.trim();
+
+      // For interactive or text elements
+      if (['BUTTON', 'A', 'H1', 'H2', 'H3', 'H4', 'P', 'SPAN', 'LABEL', 'LI'].includes(el.tagName)) {
+        return (el.innerText || el.textContent || '').trim();
+      }
+
+      const text = (el.innerText || el.textContent || '').trim();
+      if (text && text.length < 300) {
+        return text;
+      }
+      return '';
+    };
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target) return;
+
+      if (hoverTimerRef.current) {
+        window.clearTimeout(hoverTimerRef.current);
+      }
+
+      hoverTimerRef.current = window.setTimeout(() => {
+        const text = extractReadableText(target);
+        if (text && text !== lastSpokenRef.current) {
+          if (currentHighlightedElRef.current && currentHighlightedElRef.current !== target) {
+            currentHighlightedElRef.current.classList.remove('screen-narrator-highlight');
+          }
+          target.classList.add('screen-narrator-highlight');
+          currentHighlightedElRef.current = target;
+          lastSpokenRef.current = text;
+          speak(text);
+        }
+      }, 200);
+    };
+
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (hoverTimerRef.current) {
+        window.clearTimeout(hoverTimerRef.current);
+      }
+      if (target && target === currentHighlightedElRef.current) {
+        target.classList.remove('screen-narrator-highlight');
+        currentHighlightedElRef.current = null;
+      }
+    };
+
+    const handleMouseUp = () => {
+      const selection = window.getSelection();
+      const selectedText = selection?.toString().trim();
+      if (selectedText && selectedText.length > 0) {
+        lastSpokenRef.current = selectedText;
+        speak(selectedText);
+      }
+    };
+
+    document.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.addEventListener('mouseout', handleMouseOut, { passive: true });
+    document.addEventListener('mouseup', handleMouseUp, { passive: true });
+
+    return () => {
+      if (hoverTimerRef.current) {
+        window.clearTimeout(hoverTimerRef.current);
+      }
+      if (currentHighlightedElRef.current) {
+        currentHighlightedElRef.current.classList.remove('screen-narrator-highlight');
+      }
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [settings.screenNarrator, settings.speechRate]);
+
   // Sound chime helper
   const playSoundChime = () => {
     if (!settings.soundCues) return;
@@ -172,6 +276,25 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setAslSupport = (val: boolean) => {
     setSettings(prev => ({ ...prev, aslSupport: val }));
+    playSoundChime();
+  };
+
+  const setScreenNarrator = (val: boolean) => {
+    setSettings(prev => ({ ...prev, screenNarrator: val }));
+    if (!val) {
+      stopSpeaking();
+    }
+    playSoundChime();
+  };
+
+  const toggleScreenNarrator = () => {
+    setSettings(prev => {
+      const next = !prev.screenNarrator;
+      if (!next) {
+        stopSpeaking();
+      }
+      return { ...prev, screenNarrator: next };
+    });
     playSoundChime();
   };
 
@@ -264,6 +387,7 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     settings.brailleSupport,
     settings.aslSupport,
     settings.readingRuler,
+    settings.screenNarrator,
     settings.highContrast !== 'off',
     settings.fontSize !== 100,
     settings.dyslexicFont,
@@ -308,6 +432,8 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
         toggleMenu,
         setBrailleSupport,
         setAslSupport,
+        setScreenNarrator,
+        toggleScreenNarrator,
         setHighContrast,
         setFontSize,
         setDyslexicFont,
@@ -363,6 +489,13 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
 
       {/* Dyslexic & Custom Accessibility CSS Overrides */}
       <style>{`
+        .screen-narrator-highlight {
+          outline: 2.5px solid #8E2856 !important;
+          outline-offset: 2px !important;
+          background-color: rgba(142, 40, 86, 0.12) !important;
+          border-radius: 6px !important;
+          transition: outline 0.1s ease, background-color 0.1s ease;
+        }
         .dyslexic-font-active {
           font-family: 'OpenDyslexic', 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
           letter-spacing: 0.035em !important;
@@ -395,6 +528,25 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
       >
         {children}
       </div>
+
+      {/* Screen Narrator Active Floating Indicator Banner */}
+      {settings.screenNarrator && (
+        <div
+          className="fixed top-3 left-1/2 -translate-x-1/2 z-[9999] bg-[#8E2856] text-white px-4 py-1.5 rounded-full shadow-[0_8px_30px_rgba(142,40,86,0.35)] flex items-center gap-2.5 text-xs font-bold animate-in fade-in slide-in-from-top-2 select-none border border-white/20"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="w-2 h-2 rounded-full bg-rose-300 animate-ping" />
+          <span>Screen Narrator ON • Hover or select text to read</span>
+          <button
+            onClick={() => setScreenNarrator(false)}
+            className="ml-1 bg-white/20 hover:bg-white/30 text-white text-[10px] px-2.5 py-0.5 rounded-full transition-colors cursor-pointer"
+            title="Turn off Screen Narrator"
+          >
+            Turn Off
+          </button>
+        </div>
+      )}
 
       {/* Draggable ADHD Reading Guide / Focus Ruler */}
       {settings.readingRuler && (

@@ -43,16 +43,23 @@ interface GameLevel {
   }>;
   parScore: number;
   maxShots: number;
+  optimalAngle: number;
+  optimalMin: number;
+  optimalMax: number;
+  optimalPower: number;
+  optimalPowerMin: number;
+  optimalPowerMax: number;
+  optimalLabel: string;
 }
 
 const LEVELS: GameLevel[] = [
   {
     id: 1,
     title: 'Level 1: The 45° Sweet Spot',
-    conceptName: 'Maximum Range Angle',
+    conceptName: 'Maximum Range Angle & Tension',
     conceptFormula: 'R = (v₀² · sin(2θ)) / g',
-    hint: 'Aim close to 45°! Since sin(2 · 45°) = sin(90°) = 1, 45° delivers maximum horizontal distance for any given pull.',
-    explanation: 'Physics Proof: Horizontal range is proportional to sin(2θ). The sine function peaks at 90°, meaning 2θ = 90° → θ = 45° produces the absolute maximum distance possible on level ground.',
+    hint: 'Aim at 45° with 74% pull tension! Both optimal angle AND the right power are required to reach the target.',
+    explanation: 'Physics Proof: Horizontal range R = (v₀² · sin 2θ) / g. Range depends on both the angle factor sin(2θ) (peaking at 45°) and launch kinetic energy (v₀²). Even at 45°, under-pulling falls short and over-pulling overshoots!',
     gravity: 9.8,
     targetX: 740,
     targetY: 420,
@@ -62,14 +69,21 @@ const LEVELS: GameLevel[] = [
     ],
     parScore: 1000,
     maxShots: 3,
+    optimalAngle: 45,
+    optimalMin: 43,
+    optimalMax: 47,
+    optimalPower: 74,
+    optimalPowerMin: 71,
+    optimalPowerMax: 77,
+    optimalLabel: '45° @ 74% Power — Max Earth Reach',
   },
   {
     id: 2,
     title: 'Level 2: Complementary Angles',
     conceptName: 'Equal Range, Different Flight Paths',
     conceptFormula: 'R(θ) = R(90° - θ)',
-    hint: 'A wall blocks the flat 30° shot! Try shooting at its complementary angle (60°) to achieve the exact same distance while lobbing high over the wall.',
-    explanation: 'Physics Proof: sin(2 · 30°) = sin(60°) = √3/2, and sin(2 · 60°) = sin(120°) = √3/2. Any two launch angles that add up to 90° land at the exact same horizontal distance, but the higher angle spends much longer in the air!',
+    hint: 'A 210px wall blocks the flat 30° shot! Shoot at its complementary angle (60°) with 79% power to lob high over the wall.',
+    explanation: 'Physics Proof: sin(2 · 30°) = sin(60°) = √3/2, and sin(2 · 60°) = sin(120°) = √3/2. Launching at 60° with 79% power achieves the exact same ground reach as 30° while reaching 3× higher peak altitude to clear the stone barrier.',
     gravity: 9.8,
     targetX: 720,
     targetY: 430,
@@ -82,35 +96,49 @@ const LEVELS: GameLevel[] = [
     ],
     parScore: 1200,
     maxShots: 3,
+    optimalAngle: 60,
+    optimalMin: 58,
+    optimalMax: 62,
+    optimalPower: 79,
+    optimalPowerMin: 76,
+    optimalPowerMax: 82,
+    optimalLabel: '60° @ 79% Power — High Barrier Lob',
   },
   {
     id: 3,
     title: 'Level 3: The High Apex Lob',
-    conceptName: 'Peak Height (H_max)',
+    conceptName: 'Peak Height & Steep Drop',
     conceptFormula: 'H = (v₀² · sin²θ) / (2g)',
-    hint: 'The target is nestled in a deep bunker surrounded by stone towers. Use a steep angle (~70°–75°) so your projectile plunges vertically downward!',
-    explanation: 'Physics Proof: Vertical apex height depends on the vertical velocity component (v₀ · sinθ). Steep angles convert nearly all kinetic energy into vertical altitude, allowing vertical bunker drops.',
+    hint: 'The target is shielded inside a sunken stone bunker. Pull 93% tension at a steep 73° angle so your shot plunges vertically between the towers!',
+    explanation: 'Physics Proof: Apex height H = (v₀² · sin²θ) / (2g). At a steep 73° angle, 91% of kinetic energy is directed upward. With 93% power, the shot climbs high above the 220px towers and drops straight into the sunken chamber.',
     gravity: 9.8,
-    targetX: 750,
+    targetX: 640,
     targetY: 430,
     obstacles: [
       // Left high stone wall
-      { x: 670, y: 220, w: 28, h: 260, type: 'stone', health: 999 },
+      { x: 565, y: 260, w: 22, h: 220, type: 'stone', health: 999 },
       // Right backstop
-      { x: 800, y: 220, w: 28, h: 260, type: 'stone', health: 999 },
+      { x: 715, y: 260, w: 22, h: 220, type: 'stone', health: 999 },
       // Bunker base
-      { x: 705, y: 450, w: 90, h: 30, type: 'wood', health: 40 },
+      { x: 595, y: 450, w: 110, h: 30, type: 'wood', health: 40 },
     ],
     parScore: 1500,
     maxShots: 3,
+    optimalAngle: 73,
+    optimalMin: 71,
+    optimalMax: 75,
+    optimalPower: 93,
+    optimalPowerMin: 90,
+    optimalPowerMax: 96,
+    optimalLabel: '73° @ 93% Power — Bunker Apex Drop',
   },
   {
     id: 4,
     title: 'Level 4: Lunar Gravity Warp',
     conceptName: 'Inverse Gravity Scaling',
     conceptFormula: 'R ∝ 1/g  |  g_moon = 1.62 m/s²',
-    hint: 'You are now on the Moon! With gravity reduced from 9.8 to 1.62 m/s², low launch speeds float massive distances in slow motion.',
-    explanation: 'Physics Proof: Because range R is inversely proportional to gravity g, reducing g by a factor of 6 multiplies both your hang time and flight distance by roughly 6x!',
+    hint: 'On the Moon (g = 1.62 m/s²), high power will launch you into deep space! Draw only ~33% low tension at 45° to float gracefully to the target.',
+    explanation: 'Physics Proof: Range R is inversely proportional to gravity g. Because lunar gravity is 6× weaker than Earth, shots travel 6× farther with the same velocity. High tension overshoots completely—gentle 33% power at 45° is all that is needed.',
     gravity: 1.62,
     targetX: 830,
     targetY: 420,
@@ -120,6 +148,13 @@ const LEVELS: GameLevel[] = [
     ],
     parScore: 1600,
     maxShots: 3,
+    optimalAngle: 45,
+    optimalMin: 43,
+    optimalMax: 47,
+    optimalPower: 33,
+    optimalPowerMin: 30,
+    optimalPowerMax: 36,
+    optimalLabel: '45° @ 33% Power — Gentle Lunar Float',
   },
 ];
 
@@ -134,6 +169,13 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
   const [showConceptModal, setShowConceptModal] = useState(false);
   const [lastTelemetry, setLastTelemetry] = useState<{ angle: number; velocity: number; range: number; apex: number } | null>(null);
 
+  // Controlled precision angle (degrees) & launch power (percentage)
+  const [controlAngle, setControlAngle] = useState(45);
+  const [controlPower, setControlPower] = useState(75);
+
+  // Aiming status: false = natural rest in fork (no pulling shown); true = stretched & aiming
+  const [isAiming, setIsAiming] = useState(false);
+
   const level = LEVELS[currentLevelIndex];
 
   // Slingshot base anchor in canvas pixels
@@ -141,9 +183,25 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
   const SLING_Y = 380;
   const GROUND_Y = 480;
 
+  // Real-time synchronization refs for 60 FPS animation loop
+  const controlAngleRef = useRef(45);
+  const controlPowerRef = useRef(75);
+  const isAimingRef = useRef(false);
+  const hasLockedSoundPlayedRef = useRef(false);
+
   // Dragging state
   const isDraggingRef = useRef(false);
-  const dragPosRef = useRef({ x: SLING_X, y: SLING_Y });
+  const dragPosRef = useRef({ x: SLING_X, y: SLING_Y - 8 });
+
+  // Sync angle and power to the physical slingshot coordinate position
+  const syncSlingPosition = useCallback((angle: number, power: number) => {
+    const pullDist = (Math.max(15, Math.min(100, power)) / 100) * 90;
+    const rad = (Math.max(5, Math.min(88, angle)) * Math.PI) / 180;
+    dragPosRef.current = {
+      x: SLING_X - pullDist * Math.cos(rad),
+      y: SLING_Y + pullDist * Math.sin(rad),
+    };
+  }, [SLING_X, SLING_Y]);
 
   // Active projectile in flight
   interface Projectile {
@@ -197,7 +255,7 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
   // Audio synthesizer for organic indie sound effects
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  const playSound = useCallback((type: 'stretch' | 'launch' | 'hit_wood' | 'hit_target' | 'victory') => {
+  const playSound = useCallback((type: 'stretch' | 'launch' | 'hit_wood' | 'hit_target' | 'victory' | 'lock') => {
     if (!soundEnabled) return;
     try {
       const ctx = audioCtxRef.current || new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -244,6 +302,15 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
         osc.start(now);
         osc.stop(now + 0.35);
+      } else if (type === 'lock') {
+        // High melodic target lock chime (A5 -> D6 harmonic)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1174.66, now + 0.06);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
       } else if (type === 'victory') {
         // Melodic celebratory arpeggio (C5 - E5 - G5 - C6)
         [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
@@ -264,6 +331,42 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
     }
   }, [soundEnabled]);
 
+  // Audio trigger when entering both optimal angle AND optimal power window
+  const checkAndTriggerOptimalSound = useCallback((angle: number, power: number) => {
+    const isAngleOk = angle >= level.optimalMin && angle <= level.optimalMax;
+    const isPowerOk = power >= level.optimalPowerMin && power <= level.optimalPowerMax;
+    const isOptimal = isAngleOk && isPowerOk;
+
+    if (isOptimal) {
+      if (!hasLockedSoundPlayedRef.current) {
+        hasLockedSoundPlayedRef.current = true;
+        playSound('lock');
+      }
+    } else {
+      hasLockedSoundPlayedRef.current = false;
+    }
+  }, [level.optimalMin, level.optimalMax, level.optimalPowerMin, level.optimalPowerMax, playSound]);
+
+  const handleAngleChange = (newAngle: number) => {
+    const clamped = Math.max(5, Math.min(88, newAngle));
+    controlAngleRef.current = clamped;
+    isAimingRef.current = true;
+    setControlAngle(clamped);
+    setIsAiming(true);
+    syncSlingPosition(clamped, controlPowerRef.current);
+    checkAndTriggerOptimalSound(clamped, controlPowerRef.current);
+  };
+
+  const handlePowerChange = (newPower: number) => {
+    const clamped = Math.max(15, Math.min(100, newPower));
+    controlPowerRef.current = clamped;
+    isAimingRef.current = true;
+    setControlPower(clamped);
+    setIsAiming(true);
+    syncSlingPosition(controlAngleRef.current, clamped);
+    checkAndTriggerOptimalSound(controlAngleRef.current, clamped);
+  };
+
   // Reset or load level
   const loadLevel = useCallback((lvlIndex: number) => {
     const lvl = LEVELS[lvlIndex];
@@ -279,7 +382,16 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
     projectileRef.current = null;
     particlesRef.current = [];
     isDraggingRef.current = false;
-    dragPosRef.current = { x: SLING_X, y: SLING_Y };
+    hasLockedSoundPlayedRef.current = false;
+    const defaultAngle = lvl.optimalAngle;
+    const defaultPower = lvl.optimalPower;
+    controlAngleRef.current = defaultAngle;
+    controlPowerRef.current = defaultPower;
+    isAimingRef.current = false;
+    setControlAngle(defaultAngle);
+    setControlPower(defaultPower);
+    setIsAiming(false); // Slingshot starts at rest (no pulling shown on load)
+    dragPosRef.current = { x: SLING_X, y: SLING_Y - 8 }; // Sit at neutral rest in fork
     setShotsLeft(lvl.maxShots);
     setShowLevelComplete(false);
   }, [SLING_X, SLING_Y]);
@@ -308,6 +420,85 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
     }
   };
 
+  // Dynamic physics explainer: explains why specific angles produce their respective flight paths
+  const getAngleInsight = (angle: number, currentLvl: GameLevel) => {
+    const sin2 = Math.sin((2 * angle * Math.PI) / 180);
+    const sinSq = Math.pow(Math.sin((angle * Math.PI) / 180), 2);
+
+    if (angle >= 43 && angle <= 47) {
+      return {
+        title: '45° Optimal Maximum Range Sweet Spot',
+        badge: '★ OPTIMAL RANGE',
+        badgeColor: 'bg-emerald-950/80 border-emerald-500 text-emerald-300',
+        tagline: 'sin(2θ) = sin(90°) = 1.00 — Absolute Maximum Ground Distance',
+        explanation:
+          'Why use 45°? The range equation R = (v₀² · sin(2θ)) / g proves horizontal travel is strictly governed by sin(2θ). Because 90° is the absolute mathematical peak of the sine function (sin 90° = 1.0), setting 2θ = 90° (θ = 45°) achieves the maximum possible ground distance for any launch energy.',
+        strategy:
+          currentLvl.id === 1
+            ? 'Level 1 Strategy: Essential! The open-field target is situated at maximum distance. 45° gives maximum reach.'
+            : 'Great for open ground, but carries an intermediate apex height.',
+      };
+    } else if (angle >= 25 && angle <= 35) {
+      return {
+        title: '30° Flat Low-Trajectory Drive',
+        badge: 'FLAT DRIVE',
+        badgeColor: 'bg-amber-950/80 border-amber-500 text-amber-300',
+        tagline: 'High horizontal speed, but minimal apex height',
+        explanation:
+          'Why use 30°? Low launch angles keep 87% of initial velocity in the horizontal direction (vx = v₀ · cos 30°), leading to rapid forward flight. However, vertical velocity vy = 0.5 v₀ cuts flight hang-time in half and caps apex altitude to just 25% of potential height.',
+        strategy:
+          currentLvl.id === 2
+            ? 'Level 2 Warning: The 210px stone tower will block this 30° shot! Use the complementary 60° angle to lob over it!'
+            : 'Fast flight, but easily blocked by intermediate walls.',
+      };
+    } else if (angle >= 55 && angle <= 65) {
+      return {
+        title: '60° High Lob (Complementary to 30°)',
+        badge: '★ HIGH BARRIER CLEARANCE',
+        badgeColor: 'bg-cyan-950/80 border-cyan-500 text-cyan-300',
+        tagline: 'Equal Ground Range to 30°, but 3× Higher Apex (H)!',
+        explanation:
+          'Why use 60°? The Complementary Angle Principle states that any two angles adding to 90° (30° + 60° = 90°) land at the EXACT same horizontal distance because sin(2 · 30°) = sin(60°) = √3/2, and sin(2 · 60°) = sin(120°) = √3/2. But 60° reaches 300% higher apex height, arcing completely over barriers!',
+        strategy:
+          currentLvl.id === 2
+            ? 'Level 2 Solution: 60° achieves the same range as 30° while clearing the tall stone barrier effortlessly!'
+            : 'Use this whenever a high barrier blocks a direct flat line of sight.',
+      };
+    } else if (angle >= 70 && angle <= 80) {
+      return {
+        title: '75° High Apex Bunker Plunge',
+        badge: '★ VERTICAL BUNKER DROP',
+        badgeColor: 'bg-indigo-950/80 border-indigo-500 text-indigo-300',
+        tagline: 'sin²(75°) ≈ 0.93 — 93% Kinetic Energy Converted to Vertical Altitude',
+        explanation:
+          'Why use 75°? Apex height formula H = (v₀² · sin²θ) / (2g). At steep angles (~75°), over 93% of launch energy is channeled upward into altitude. At the arc peak, horizontal speed drops to a crawl, causing the projectile to plunge nearly straight down.',
+        strategy:
+          currentLvl.id === 3
+            ? 'Level 3 Solution: Flanked by high granite walls, the target orb is shielded inside a sunken bunker. Only a ~75° vertical plunge can drop in!'
+            : 'Ideal for dropping behind backstops and into recessed chambers.',
+      };
+    } else if (angle < 25) {
+      return {
+        title: `${angle}° Ultra-Shallow Launch`,
+        badge: '⚠ TOO SHALLOW',
+        badgeColor: 'bg-rose-950/80 border-rose-500 text-rose-300',
+        tagline: 'Insufficient air hang time',
+        explanation:
+          'Why avoid this angle? Total flight time is T = (2 v₀ sin θ) / g. At under 25°, the projectile has so little vertical velocity that gravity pulls it into the dirt in under a second before it can travel forward.',
+        strategy: 'Increase your angle to at least 40° for greater horizontal reach.',
+      };
+    } else {
+      return {
+        title: `${angle}° Custom Parabolic Arc`,
+        badge: 'CUSTOM TRAJECTORY',
+        badgeColor: 'bg-purple-950/80 border-purple-500 text-purple-300',
+        tagline: `Range Efficiency: ${(sin2 * 100).toFixed(0)}% | Apex Factor: ${(sinSq * 100).toFixed(0)}%`,
+        explanation: `At ${angle}°, the launch partitions kinetic energy into ${(Math.cos((angle * Math.PI) / 180) * 100).toFixed(0)}% horizontal drift and ${(Math.sin((angle * Math.PI) / 180) * 100).toFixed(0)}% vertical climb. Range is ${(sin2 * 100).toFixed(0)}% of the theoretical 45° maximum.`,
+        strategy: 'Tune toward 45° for max distance, or 60°+ to clear high obstacles.',
+      };
+    }
+  };
+
   // Convert slingshot pull vector to angle and launch velocity
   const calculateLaunchParameters = () => {
     const dx = SLING_X - dragPosRef.current.x;
@@ -316,11 +507,12 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
     // Angle in degrees above horizontal
     const angleRad = Math.atan2(dy, dx);
     let angleDeg = Math.round((angleRad * 180) / Math.PI);
-    if (angleDeg < 0) angleDeg = 0;
+    if (angleDeg < 5) angleDeg = 5;
     if (angleDeg > 88) angleDeg = 88;
 
     // Launch speed scale (0 to ~32 m/s)
     const velocity = Number(((pullDist / 90) * 32).toFixed(1));
+    const power = Math.max(15, Math.min(100, Math.round((pullDist / 90) * 100)));
 
     // Theoretical kinematic predictions on flat ground:
     // R = v^2 * sin(2*theta) / g
@@ -334,9 +526,45 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
       angleDeg,
       angleRad: rad,
       velocity,
+      power,
       theoreticalRange,
       theoreticalApex,
     };
+  };
+
+  // Fire the slingshot with current angle & power settings
+  const fireCurrentShot = () => {
+    if (projectileRef.current && projectileRef.current.active) return;
+    if (shotsLeft <= 0) return;
+
+    syncSlingPosition(controlAngle, controlPower);
+    const params = calculateLaunchParameters();
+
+    const LAUNCH_SPEED_SCALE = 0.65;
+    const simVx = params.velocity * Math.cos(params.angleRad) * LAUNCH_SPEED_SCALE;
+    const simVy = -params.velocity * Math.sin(params.angleRad) * LAUNCH_SPEED_SCALE;
+
+    projectileRef.current = {
+      x: SLING_X,
+      y: SLING_Y - 8,
+      vx: simVx,
+      vy: simVy,
+      radius: 14,
+      trail: [],
+      active: true,
+      rotation: 0,
+    };
+
+    setLastTelemetry({
+      angle: params.angleDeg,
+      velocity: params.velocity,
+      range: params.theoreticalRange,
+      apex: params.theoreticalApex,
+    });
+
+    setIsAiming(false);
+    dragPosRef.current = { x: SLING_X, y: SLING_Y - 8 };
+    playSound('launch');
   };
 
   // Main 60 FPS Physics & Indie Canvas Loop
@@ -577,38 +805,45 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
       ctx.restore();
 
       // Back rubber band (drawn behind hero character)
-      const currentDrag = isDraggingRef.current ? dragPosRef.current : { x: SLING_X, y: SLING_Y - 8 };
+      // Only stretched when player is actively aiming or dragging!
+      const isHeroArmed = (isAimingRef.current || isDraggingRef.current) && !projectileRef.current && shotsLeft > 0;
+      const currentDrag = isHeroArmed ? dragPosRef.current : { x: SLING_X, y: SLING_Y - 8 };
+
       ctx.save();
       ctx.strokeStyle = '#78350F';
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(leftForkX, leftForkY);
-      ctx.lineTo(currentDrag.x - 6, currentDrag.y);
+      ctx.lineTo(currentDrag.x - (isHeroArmed ? 6 : 0), currentDrag.y);
       ctx.stroke();
       ctx.restore();
 
       // ─────────────────────────────────────────────────────────────
-      // 5. CHALK TRAJECTORY PREDICTION (KINEMATIC GUIDANCE ARC)
+      // 5. CHALK TRAJECTORY PREDICTION (KINEMATIC GUIDANCE ARC) & PROTRACTOR HUD
       // ─────────────────────────────────────────────────────────────
-      if (isDraggingRef.current) {
-        const { angleRad, velocity } = calculateLaunchParameters();
-        const simVx = velocity * Math.cos(angleRad) * 1.55;
-        const simVy = -velocity * Math.sin(angleRad) * 1.55; // upward is negative in canvas
+      // Only render trajectory projection arc when actively aiming!
+      if (isHeroArmed) {
+        const { angleRad, angleDeg, velocity, power } = calculateLaunchParameters();
+        const isAngleOk = angleDeg >= level.optimalMin && angleDeg <= level.optimalMax;
+        const isPowerOk = power >= level.optimalPowerMin && power <= level.optimalPowerMax;
+        const isOptimal = isAngleOk && isPowerOk;
+
+        const LAUNCH_SPEED_SCALE = 0.65;
+        const simVx = velocity * Math.cos(angleRad) * LAUNCH_SPEED_SCALE;
+        const simVy = -velocity * Math.sin(angleRad) * LAUNCH_SPEED_SCALE; // upward is negative in canvas
         const simG = (level.gravity / 9.8) * 0.42;
 
         ctx.save();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.setLineDash([4, 6]);
 
         let currX = SLING_X;
-        let currY = SLING_Y;
+        let currY = SLING_Y - 8;
         let currVx = simVx;
         let currVy = simVy;
 
-        // Draw dotted flight trajectory prediction points
-        for (let step = 0; step < 38; step++) {
+        // Draw flight trajectory prediction points
+        for (let step = 0; step < 110; step++) {
           currX += currVx;
           currVy += simG;
           currY += currVy;
@@ -616,19 +851,416 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
           if (currY >= GROUND_Y) break;
 
           ctx.beginPath();
-          ctx.arc(currX, currY, step % 2 === 0 ? 2.5 : 1.5, 0, Math.PI * 2);
+          if (isOptimal) {
+            ctx.fillStyle = step % 2 === 0 ? '#34D399' : '#FDE68A';
+            ctx.shadowColor = '#10B981';
+            ctx.shadowBlur = step % 2 === 0 ? 8 : 4;
+            ctx.arc(currX, currY, step % 2 === 0 ? 3.5 : 2.2, 0, Math.PI * 2);
+          } else if (isAngleOk) {
+            // Angle is aligned, power still needs adjusting
+            ctx.fillStyle = step % 2 === 0 ? '#FBBF24' : '#FDE68A';
+            ctx.shadowBlur = 0;
+            ctx.arc(currX, currY, step % 2 === 0 ? 2.8 : 1.8, 0, Math.PI * 2);
+          } else {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+            ctx.shadowBlur = 0;
+            ctx.arc(currX, currY, step % 2 === 0 ? 3 : 1.8, 0, Math.PI * 2);
+          }
           ctx.fill();
         }
         ctx.restore();
+
+        // ─────────────────────────────────────────────────────────────
+        // 5B. INTERACTIVE PROTRACTOR & REAL-TIME ANGLE READOUT
+        // ─────────────────────────────────────────────────────────────
+        const protractorR = 54;
+        ctx.save();
+
+        // Protractor background subtle fan
+        ctx.fillStyle = 'rgba(38, 28, 22, 0.4)';
+        ctx.beginPath();
+        ctx.moveTo(SLING_X, SLING_Y);
+        ctx.arc(SLING_X, SLING_Y, protractorR + 10, 0, -Math.PI / 2, true);
+        ctx.closePath();
+        ctx.fill();
+
+        // Protractor horizontal baseline
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(SLING_X, SLING_Y);
+        ctx.lineTo(SLING_X + protractorR + 20, SLING_Y);
+        ctx.stroke();
+
+        // Optimal Angle Target Wedge Highlight
+        const optMinRad = (level.optimalMin * Math.PI) / 180;
+        const optMaxRad = (level.optimalMax * Math.PI) / 180;
+        ctx.setLineDash([]);
+        ctx.fillStyle = isOptimal ? 'rgba(16, 185, 129, 0.38)' : isAngleOk ? 'rgba(52, 211, 153, 0.25)' : 'rgba(52, 211, 153, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(SLING_X, SLING_Y);
+        ctx.arc(SLING_X, SLING_Y, protractorR + 8, -optMinRad, -optMaxRad, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = isOptimal ? '#10B981' : isAngleOk ? '#34D399' : 'rgba(52, 211, 153, 0.6)';
+        ctx.lineWidth = isOptimal ? 2.5 : 1.5;
+        ctx.stroke();
+
+        // Optimal Wedge Target Label
+        const optMidRad = (level.optimalAngle * Math.PI) / 180;
+        const optDist = protractorR + 22;
+        const optLX = SLING_X + Math.cos(optMidRad) * optDist;
+        const optLY = SLING_Y - Math.sin(optMidRad) * optDist;
+        ctx.fillStyle = isOptimal ? '#34D399' : isAngleOk ? '#6EE7B7' : '#A7F3D0';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`★${level.optimalAngle}°`, optLX, optLY);
+
+        // Degree Tick Marks (15, 30, 45, 60, 75)
+        [15, 30, 45, 60, 75].forEach(deg => {
+          const r = (deg * Math.PI) / 180;
+          const x1 = SLING_X + Math.cos(r) * (protractorR - 2);
+          const y1 = SLING_Y - Math.sin(r) * (protractorR - 2);
+          const x2 = SLING_X + Math.cos(r) * (protractorR + 5);
+          const y2 = SLING_Y - Math.sin(r) * (protractorR + 5);
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.lineWidth = deg === 45 ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+
+          if (deg === 30 || deg === 45 || deg === 60 || deg === 75) {
+            const tx = SLING_X + Math.cos(r) * (protractorR - 12);
+            const ty = SLING_Y - Math.sin(r) * (protractorR - 12);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '8px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${deg}°`, tx, ty);
+          }
+        });
+
+        // Current Launch Angle Arc
+        ctx.strokeStyle = isOptimal ? '#34D399' : isAngleOk ? '#6EE7B7' : '#FBBF24';
+        ctx.lineWidth = isOptimal ? 3.5 : 2.5;
+        if (isOptimal) {
+          ctx.shadowColor = '#10B981';
+          ctx.shadowBlur = 12;
+        }
+        ctx.beginPath();
+        ctx.arc(SLING_X, SLING_Y, protractorR, 0, -angleRad, true);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Launch Vector Direction Arrow
+        const arrowLen = protractorR + 18;
+        const arrowX = SLING_X + Math.cos(angleRad) * arrowLen;
+        const arrowY = SLING_Y - Math.sin(angleRad) * arrowLen;
+        ctx.strokeStyle = isOptimal ? '#10B981' : isAngleOk ? '#34D399' : '#F59E0B';
+        ctx.lineWidth = isOptimal ? 3 : 2;
+        ctx.beginPath();
+        ctx.moveTo(SLING_X, SLING_Y);
+        ctx.lineTo(arrowX, arrowY);
+        ctx.stroke();
+
+        // Arrowhead
+        const headLen = 8;
+        ctx.fillStyle = isOptimal ? '#10B981' : isAngleOk ? '#34D399' : '#F59E0B';
+        ctx.beginPath();
+        ctx.moveTo(arrowX, arrowY);
+        ctx.lineTo(
+          arrowX - headLen * Math.cos(angleRad - Math.PI / 6),
+          arrowY + headLen * Math.sin(angleRad - Math.PI / 6)
+        );
+        ctx.lineTo(
+          arrowX - headLen * Math.cos(angleRad + Math.PI / 6),
+          arrowY + headLen * Math.sin(angleRad + Math.PI / 6)
+        );
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+
+        // ─────────────────────────────────────────────────────────────
+        // 5E. SLINGSHOT TENSION POWER GAUGE
+        // ─────────────────────────────────────────────────────────────
+        const gaugeX = SLING_X - 64;
+        const gaugeY = SLING_Y - 55;
+        const gaugeW = 10;
+        const gaugeH = 75;
+
+        ctx.save();
+        // Gauge track frame
+        ctx.fillStyle = 'rgba(26, 20, 16, 0.75)';
+        ctx.strokeStyle = 'rgba(120, 80, 50, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(gaugeX, gaugeY, gaugeW, gaugeH, 4);
+        else ctx.rect(gaugeX, gaugeY, gaugeW, gaugeH);
+        ctx.fill();
+        ctx.stroke();
+
+        // Target Power Sweet Spot Zone
+        const optPwrMinFrac = level.optimalPowerMin / 100;
+        const optPwrMaxFrac = level.optimalPowerMax / 100;
+        const optPwrTop = gaugeY + gaugeH * (1 - optPwrMaxFrac);
+        const optPwrH = gaugeH * (optPwrMaxFrac - optPwrMinFrac);
+
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.35)';
+        ctx.fillRect(gaugeX + 1, optPwrTop, gaugeW - 2, optPwrH);
+        ctx.strokeStyle = '#34D399';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(gaugeX, optPwrTop, gaugeW, optPwrH);
+
+        // Power Fill Bar
+        const fillFrac = power / 100;
+        const fillH = gaugeH * fillFrac;
+        const fillTop = gaugeY + gaugeH - fillH;
+
+        ctx.fillStyle = isPowerOk ? '#10B981' : power > level.optimalPowerMax ? '#EF4444' : '#F59E0B';
+        if (isPowerOk) {
+          ctx.shadowColor = '#10B981';
+          ctx.shadowBlur = 8;
+        }
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(gaugeX + 1.5, fillTop, gaugeW - 3, fillH, 3);
+        else ctx.rect(gaugeX + 1.5, fillTop, gaugeW - 3, fillH);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Label above tension bar
+        ctx.fillStyle = isPowerOk ? '#34D399' : '#FEF3C7';
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${power}%`, gaugeX + gaugeW / 2, gaugeY - 6);
+        ctx.restore();
+
+        // ─────────────────────────────────────────────────────────────
+        // 5C. DYNAMIC FLOATING HUD PILL DIRECTLY ABOVE USER'S DRAG POSITION
+        // ─────────────────────────────────────────────────────────────
+        const hudX = currentDrag.x;
+        const hudY = currentDrag.y - 42;
+
+        let hudTitle = `θ = ${angleDeg}°  |  Power = ${power}%`;
+        let hudSubtitle = `Target: ${level.optimalAngle}° @ ${level.optimalPower}%`;
+        let hudBg = 'rgba(30, 24, 20, 0.94)';
+        let hudBorder = 'rgba(217, 119, 6, 0.8)';
+        let hudTextColor = '#FEF3C7';
+
+        if (isOptimal) {
+          hudTitle = `★ SWEET SPOT LOCKED! [ ${angleDeg}° @ ${power}% ]`;
+          hudSubtitle = `[ ${level.optimalLabel} ]`;
+          hudBg = 'rgba(6, 78, 59, 0.96)';
+          hudBorder = '#34D399';
+          hudTextColor = '#6EE7B7';
+        } else if (isAngleOk && !isPowerOk) {
+          if (power < level.optimalPowerMin) {
+            hudTitle = `★ ${angleDeg}° Angle OK! ⚠ Power Too Weak (${power}%)`;
+            hudSubtitle = `Pull back harder to reach ~${level.optimalPower}% Power!`;
+            hudBg = 'rgba(120, 53, 15, 0.95)';
+            hudBorder = '#FBBF24';
+            hudTextColor = '#FEF08A';
+          } else {
+            hudTitle = `★ ${angleDeg}° Angle OK! ⚠ Overpowered (${power}%)`;
+            hudSubtitle = `Ease forward to reach ~${level.optimalPower}% Power!`;
+            hudBg = 'rgba(127, 29, 29, 0.95)';
+            hudBorder = '#F87171';
+            hudTextColor = '#FECACA';
+          }
+        } else if (!isAngleOk && isPowerOk) {
+          hudTitle = `⚡ ${power}% Power OK! ⚠ Adjust Angle (${angleDeg}°)`;
+          hudSubtitle = `Target Angle: ~${level.optimalAngle}° (Current: ${angleDeg}°)`;
+          hudBg = 'rgba(120, 53, 15, 0.95)';
+          hudBorder = '#FBBF24';
+          hudTextColor = '#FEF08A';
+        } else if (level.id === 2 && angleDeg < 50) {
+          hudTitle = `⚠ ${angleDeg}° WILL HIT WALL!`;
+          hudSubtitle = `Lob ~60° @ ~79% Power to clear barrier`;
+          hudBg = 'rgba(127, 29, 29, 0.92)';
+          hudBorder = '#F87171';
+          hudTextColor = '#FECACA';
+        } else if (level.id === 3 && angleDeg < 70) {
+          hudTitle = `⚠ ${angleDeg}° TOO FLAT FOR BUNKER!`;
+          hudSubtitle = `Use ~73° steep plunge @ ~93% Power`;
+          hudBg = 'rgba(127, 29, 29, 0.92)';
+          hudBorder = '#F87171';
+          hudTextColor = '#FECACA';
+        } else if (Math.abs(angleDeg - level.optimalAngle) <= 6) {
+          hudTitle = `${angleDeg}° — Near Angle Target!`;
+          hudSubtitle = `Align to ${level.optimalAngle}° @ ${level.optimalPower}% Power`;
+          hudBg = 'rgba(120, 53, 15, 0.92)';
+          hudBorder = '#FBBF24';
+          hudTextColor = '#FEF08A';
+        }
+
+        ctx.save();
+        ctx.font = 'bold 12px sans-serif';
+        const titleWidth = ctx.measureText(hudTitle).width;
+        ctx.font = 'bold 10px sans-serif';
+        const subWidth = hudSubtitle ? ctx.measureText(hudSubtitle).width : 0;
+        const pillW = Math.max(titleWidth, subWidth) + 24;
+        const pillH = hudSubtitle ? 36 : 24;
+        const pillX = hudX - pillW / 2;
+        const pillY = hudY - pillH / 2;
+
+        if (isOptimal) {
+          ctx.shadowColor = '#10B981';
+          ctx.shadowBlur = 14;
+        }
+        ctx.fillStyle = hudBg;
+        ctx.strokeStyle = hudBorder;
+        ctx.lineWidth = isOptimal ? 2 : 1.5;
+
+        // Rounded pill box
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(pillX, pillY, pillW, pillH, 8);
+        } else {
+          ctx.rect(pillX, pillY, pillW, pillH);
+        }
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Pointer triangle towards pouch
+        ctx.fillStyle = hudBorder;
+        ctx.beginPath();
+        ctx.moveTo(hudX - 5, pillY + pillH);
+        ctx.lineTo(hudX + 5, pillY + pillH);
+        ctx.lineTo(hudX, pillY + pillH + 6);
+        ctx.closePath();
+        ctx.fill();
+
+        // Text
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = hudTextColor;
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(hudTitle, hudX, hudSubtitle ? pillY + 12 : pillY + pillH / 2);
+
+        if (hudSubtitle) {
+          ctx.fillStyle = isOptimal ? '#FDE68A' : 'rgba(255, 255, 255, 0.85)';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillText(hudSubtitle, hudX, pillY + 25);
+        }
+        ctx.restore();
+
+        // ─────────────────────────────────────────────────────────────
+        // 5D. TARGET ORB LOCK-ON RETICLE WHEN OPTIMAL ANGLE & POWER REACHED
+        // ─────────────────────────────────────────────────────────────
+        if (isOptimal && targetRef.current.alive) {
+          ctx.save();
+          const targetObj = targetRef.current;
+          const pulse = Math.sin(Date.now() / 120) * 3;
+          const lockR = targetObj.radius + 10 + pulse;
+
+          // Rotating Lock Ring
+          const spin = Date.now() / 400;
+          ctx.save();
+          ctx.translate(targetObj.x, targetObj.y);
+          ctx.rotate(spin);
+          ctx.strokeStyle = '#10B981';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([8, 8]);
+          ctx.shadowColor = '#34D399';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(0, 0, lockR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+
+          // 4 Corner Brackets
+          const bSize = 8;
+          const bOffset = targetObj.radius + 14;
+          ctx.strokeStyle = '#34D399';
+          ctx.lineWidth = 2.5;
+          ctx.shadowColor = '#10B981';
+          ctx.shadowBlur = 8;
+
+          // Top-left
+          ctx.beginPath();
+          ctx.moveTo(targetObj.x - bOffset, targetObj.y - bOffset + bSize);
+          ctx.lineTo(targetObj.x - bOffset, targetObj.y - bOffset);
+          ctx.lineTo(targetObj.x - bOffset + bSize, targetObj.y - bOffset);
+          ctx.stroke();
+          // Top-right
+          ctx.beginPath();
+          ctx.moveTo(targetObj.x + bOffset - bSize, targetObj.y - bOffset);
+          ctx.lineTo(targetObj.x + bOffset, targetObj.y - bOffset);
+          ctx.lineTo(targetObj.x + bOffset, targetObj.y - bOffset + bSize);
+          ctx.stroke();
+          // Bottom-left
+          ctx.beginPath();
+          ctx.moveTo(targetObj.x - bOffset, targetObj.y + bOffset - bSize);
+          ctx.lineTo(targetObj.x - bOffset, targetObj.y + bOffset);
+          ctx.lineTo(targetObj.x - bOffset + bSize, targetObj.y + bOffset);
+          ctx.stroke();
+          // Bottom-right
+          ctx.beginPath();
+          ctx.moveTo(targetObj.x + bOffset - bSize, targetObj.y + bOffset);
+          ctx.lineTo(targetObj.x + bOffset, targetObj.y + bOffset);
+          ctx.lineTo(targetObj.x + bOffset, targetObj.y + bOffset - bSize);
+          ctx.stroke();
+
+          // Floating Lock Badge above target
+          const badgeY = targetObj.y - bOffset - 14;
+          ctx.fillStyle = 'rgba(6, 78, 59, 0.95)';
+          ctx.strokeStyle = '#10B981';
+          ctx.lineWidth = 1.5;
+          const lockTxt = `[ ⌖ TARGET LOCKED: ${level.optimalAngle}° @ ${level.optimalPower}% ]`;
+          ctx.font = 'bold 10px monospace';
+          const lockW = ctx.measureText(lockTxt).width + 16;
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(targetObj.x - lockW / 2, badgeY - 9, lockW, 18, 6);
+          } else {
+            ctx.rect(targetObj.x - lockW / 2, badgeY - 9, lockW, 18);
+          }
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#6EE7B7';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(lockTxt, targetObj.x, badgeY);
+
+          ctx.restore();
+        } else if (isAngleOk && !isPowerOk && targetRef.current.alive) {
+          // Soft amber indicator showing angle is locked, but power needs adjustment
+          ctx.save();
+          const targetObj = targetRef.current;
+          const badgeY = targetObj.y - targetObj.radius - 20;
+          ctx.fillStyle = 'rgba(120, 53, 15, 0.9)';
+          ctx.strokeStyle = '#FBBF24';
+          ctx.lineWidth = 1;
+          const hintTxt = `⚠ SET POWER TO ~${level.optimalPower}%`;
+          ctx.font = 'bold 9px monospace';
+          const hintW = ctx.measureText(hintTxt).width + 12;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(targetObj.x - hintW / 2, badgeY - 8, hintW, 16, 4);
+          else ctx.rect(targetObj.x - hintW / 2, badgeY - 8, hintW, 16);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#FEF08A';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(hintTxt, targetObj.x, badgeY);
+          ctx.restore();
+        }
       }
 
       // ─────────────────────────────────────────────────────────────
       // 6. HERO CHARACTER (EXO SCOUT WITH AVIATOR GOGGLES)
       // ─────────────────────────────────────────────────────────────
-      const heroPos = isDraggingRef.current
-        ? dragPosRef.current
-        : projectileRef.current
+      const heroPos = projectileRef.current
         ? { x: projectileRef.current.x, y: projectileRef.current.y }
+        : isHeroArmed
+        ? dragPosRef.current
         : { x: SLING_X, y: SLING_Y - 8 };
 
       ctx.save();
@@ -698,8 +1330,16 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(rightForkX, rightForkY);
-      ctx.lineTo(currentDrag.x + 6, currentDrag.y);
+      ctx.lineTo(currentDrag.x + (isHeroArmed ? 6 : 0), currentDrag.y);
       ctx.stroke();
+
+      // Slingshot leather pouch (only rendered when armed & stretched)
+      if (isHeroArmed) {
+        ctx.fillStyle = '#3F2212';
+        ctx.beginPath();
+        ctx.ellipse(currentDrag.x, currentDrag.y, 8, 12, (controlAngle * Math.PI) / 180, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
 
       // ─────────────────────────────────────────────────────────────
@@ -737,13 +1377,21 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
             proj.y + proj.radius >= obs.y &&
             proj.y - proj.radius <= obs.y + obs.h
           ) {
-            obs.health -= 25;
-            proj.vx *= 0.45;
-            proj.vy *= 0.45;
-            spawnParticles(proj.x, proj.y, obs.type === 'wood' ? '#B47B49' : obs.type === 'glass' ? '#BAE6FD' : '#848C9E', 14);
-            playSound('hit_wood');
-            if (obs.health <= 0) {
-              setScore(s => s + 250);
+            if (obs.type === 'stone') {
+              // Heavy granite barrier recoil - repels low shots backward
+              proj.vx = -Math.abs(proj.vx) * 0.45;
+              proj.vy = Math.min(proj.vy, -1) + 2.5;
+              spawnParticles(proj.x, proj.y, '#848C9E', 14);
+              playSound('hit_wood');
+            } else {
+              obs.health -= 25;
+              proj.vx *= 0.55;
+              proj.vy *= 0.55;
+              spawnParticles(proj.x, proj.y, obs.type === 'wood' ? '#B47B49' : '#BAE6FD', 14);
+              playSound('hit_wood');
+              if (obs.health <= 0) {
+                setScore(s => s + 250);
+              }
             }
           }
         });
@@ -828,6 +1476,9 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
         return remaining;
       });
       projectileRef.current = null;
+      isAimingRef.current = false;
+      setIsAiming(false);
+      dragPosRef.current = { x: SLING_X, y: SLING_Y - 8 };
     }, 400);
   };
 
@@ -842,8 +1493,16 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
 
     // Check click near slingshot anchor
     const distToSling = Math.hypot(x - SLING_X, y - SLING_Y);
-    if (distToSling < 60) {
+    if (distToSling < 75) {
       isDraggingRef.current = true;
+      isAimingRef.current = true;
+      setIsAiming(true);
+      hasLockedSoundPlayedRef.current = false;
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // pointer capture fallback
+      }
       dragPosRef.current = { x, y };
       playSound('stretch');
     }
@@ -855,58 +1514,66 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
     const rawX = ((e.clientX - rect.left) / rect.width) * 960;
     const rawY = ((e.clientY - rect.top) / rect.height) * 540;
 
-    // Restrict pull backward and downward
-    const dx = rawX - SLING_X;
-    const dy = rawY - SLING_Y;
-    const dist = Math.hypot(dx, dy);
-    const maxPull = 90;
+    // Slingshot anchor is at (SLING_X, SLING_Y)
+    // To aim forward & up, user pulls backward (rawX < SLING_X) and downward (rawY > SLING_Y)
+    const pullX = SLING_X - rawX;
+    const pullY = rawY - SLING_Y;
 
-    if (dist > maxPull) {
-      const angle = Math.atan2(dy, dx);
-      dragPosRef.current = {
-        x: SLING_X + Math.cos(angle) * maxPull,
-        y: SLING_Y + Math.sin(angle) * maxPull,
-      };
-    } else {
-      dragPosRef.current = { x: rawX, y: rawY };
-    }
+    // Disallow pulling forward ahead of slingshot fork
+    const validPullX = Math.max(8, pullX);
+    const validPullY = Math.max(4, pullY);
+
+    const pullDist = Math.hypot(validPullX, validPullY);
+    const maxPull = 90;
+    const clampedDist = Math.min(maxPull, Math.max(14, pullDist));
+
+    const angleRad = Math.atan2(validPullY, validPullX);
+    let deg = Math.round((angleRad * 180) / Math.PI);
+    if (deg < 8) deg = 8;
+    if (deg > 86) deg = 86;
+
+    const pwr = Math.round((clampedDist / maxPull) * 100);
+
+    // Physically accurate slingshot coordinate
+    const actualX = SLING_X - Math.cos(angleRad) * clampedDist;
+    const actualY = SLING_Y + Math.sin(angleRad) * clampedDist;
+
+    const clampedPwr = Math.max(15, Math.min(100, pwr));
+    dragPosRef.current = { x: actualX, y: actualY };
+    isAimingRef.current = true;
+    controlAngleRef.current = deg;
+    controlPowerRef.current = clampedPwr;
+
+    setControlAngle(deg);
+    setControlPower(clampedPwr);
+    setIsAiming(true);
+    checkAndTriggerOptimalSound(deg, clampedPwr);
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e?: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    if (e) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        // pointer release fallback
+      }
+    }
 
     const params = calculateLaunchParameters();
     // Only launch if pulled with minimum intention
-    if (params.pullDist > 14) {
-      const simVx = params.velocity * Math.cos(params.angleRad) * 1.55;
-      const simVy = -params.velocity * Math.sin(params.angleRad) * 1.55; // upward is negative in canvas
-
-      projectileRef.current = {
-        x: SLING_X,
-        y: SLING_Y - 8,
-        vx: simVx,
-        vy: simVy,
-        radius: 14,
-        trail: [],
-        active: true,
-        rotation: 0,
-      };
-
-      setLastTelemetry({
-        angle: params.angleDeg,
-        velocity: params.velocity,
-        range: params.theoreticalRange,
-        apex: params.theoreticalApex,
-      });
-
-      playSound('launch');
+    if (params.pullDist > 16) {
+      fireCurrentShot();
     } else {
-      dragPosRef.current = { x: SLING_X, y: SLING_Y };
+      isAimingRef.current = false;
+      setIsAiming(false);
+      dragPosRef.current = { x: SLING_X, y: SLING_Y - 8 };
     }
   };
 
   const liveParams = calculateLaunchParameters();
+  const angleInsight = getAngleInsight(controlAngle, level);
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col bg-[#2A2421] text-[#2C2936] font-sans select-none ${className}`}>
@@ -1000,8 +1667,9 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
       </header>
 
       {/* ── MAIN INDIE CANVAS STAGE ── */}
-      <div className="flex-1 relative flex items-center justify-center p-4 bg-[#1E1916] overflow-hidden">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#4E392B] bg-[#5D7BA6] max-w-5xl w-full aspect-[16/9]">
+      <div className="flex-1 relative flex flex-col items-center justify-start p-4 sm:p-5 bg-[#1E1916] overflow-y-auto space-y-4">
+        {/* Canvas Game Stage */}
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#4E392B] bg-[#5D7BA6] max-w-5xl w-full aspect-[16/9] shrink-0">
           
           <canvas
             ref={canvasRef}
@@ -1014,17 +1682,361 @@ export const TrajectoryTitanGame: React.FC<TrajectoryTitanGameProps> = ({ onBack
             className="w-full h-full cursor-crosshair touch-none"
           />
 
-          {/* Subtle Pull Instruction Banner on First Launch */}
-          {!isDraggingRef.current && shotsLeft === level.maxShots && !projectileRef.current && (
-            <div className="pointer-events-none absolute bottom-16 left-12 px-4 py-2 rounded-2xl bg-[#2A1F17]/85 backdrop-blur-md border border-amber-800/80 text-amber-100 text-xs font-semibold shadow-lg animate-bounce flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Drag the slingshot backward & release to test launch angles!</span>
+          {/* Dynamic Aim Status & Instructions Banner */}
+          {!projectileRef.current && (
+            <div className={`pointer-events-none absolute bottom-12 left-8 px-4 py-2 rounded-2xl backdrop-blur-md border text-xs font-semibold shadow-xl flex items-center gap-2.5 transition-all ${
+              controlAngle >= level.optimalMin && controlAngle <= level.optimalMax && controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax
+                ? 'bg-emerald-950/90 border-emerald-500 text-emerald-200 shadow-emerald-950/80 ring-2 ring-emerald-400/40'
+                : 'bg-[#2A1F17]/90 border-amber-800/80 text-amber-100 shadow-amber-950/80'
+            }`}>
+              {isAiming ? (
+                controlAngle >= level.optimalMin && controlAngle <= level.optimalMax && controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax ? (
+                  <>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span>
+                      <strong className="text-emerald-300 font-black">★ {controlAngle}° @ {controlPower}% SWEET SPOT LOCKED!</strong>{' '}
+                      Release slingshot or tap Fire to strike target!
+                    </span>
+                  </>
+                ) : controlAngle >= level.optimalMin && controlAngle <= level.optimalMax ? (
+                  <>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                    <span>
+                      Angle <strong className="text-emerald-400 font-mono">{controlAngle}°</strong> is Perfect!{' '}
+                      <span className="text-amber-200">Set Power to ~<strong className="text-yellow-300 font-mono">{level.optimalPower}%</strong> (Current: {controlPower}%)</span>
+                    </span>
+                  </>
+                ) : controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax ? (
+                  <>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                    <span>
+                      Power <strong className="text-emerald-400 font-mono">{controlPower}%</strong> is Perfect!{' '}
+                      <span className="text-amber-200">Adjust Angle to ~<strong className="text-yellow-300 font-mono">{level.optimalAngle}°</strong> (Current: {controlAngle}°)</span>
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                    <span>
+                      Aiming: <strong className="text-yellow-300 font-mono">{controlAngle}°</strong> at{' '}
+                      <strong className="text-yellow-300 font-mono">{controlPower}%</strong> tension{' '}
+                      <span className="text-amber-300/80">(Need: {level.optimalAngle}° @ {level.optimalPower}%)</span>
+                    </span>
+                  </>
+                )
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-amber-400 animate-bounce" />
+                  <span>Pull slingshot on canvas OR adjust Angle & Power below to aim!</span>
+                </>
+              )}
             </div>
           )}
 
           {/* Physics Tip Ribbon at Top Center */}
           <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-[#2A1F17]/80 backdrop-blur-md border border-amber-800/60 text-amber-200 text-[11px] font-bold shadow-md tracking-wide">
             {level.hint}
+          </div>
+        </div>
+
+        {/* ── PRECISION ANGLE & POWER KINEMATICS CONSOLE ── */}
+        <div className="max-w-5xl w-full bg-[#2A1F17] rounded-3xl border-2 border-amber-900/80 p-4 sm:p-5 shadow-2xl shrink-0 text-amber-100 space-y-4">
+          
+          {/* ── INTERACTIVE "WHY WE USE THIS ANGLE" KINEMATICS EXPLAINER MODULE ── */}
+          <div className="p-4 rounded-2xl bg-[#1C1510] border-2 border-amber-800/70 shadow-inner space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-900/60 pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 flex items-center justify-center text-amber-950 font-black shadow-md shrink-0">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-sm font-extrabold text-white tracking-tight">
+                      {angleInsight.title}
+                    </h4>
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${angleInsight.badgeColor}`}>
+                      {angleInsight.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-amber-300/80 font-medium">{angleInsight.tagline}</p>
+                </div>
+              </div>
+
+              {/* Quick Stance Control: Idle vs Aim Stretched */}
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    if (!isAiming) {
+                      setIsAiming(true);
+                      syncSlingPosition(controlAngle, controlPower);
+                    } else {
+                      setIsAiming(false);
+                      dragPosRef.current = { x: SLING_X, y: SLING_Y - 8 };
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                    isAiming
+                      ? 'bg-amber-500 text-amber-950 border-amber-400 shadow-sm'
+                      : 'bg-[#2A1F17] hover:bg-[#3D2E24] text-amber-200 border-amber-800/60'
+                  }`}
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  <span>{isAiming ? 'Aim Mode Active' : 'Engage Aim Stance'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Kinematic Reason Paragraph & Level Strategy */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+              <div className="p-3 rounded-xl bg-[#261C15] border border-amber-900/50 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                  <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+                  <span>Physics Reason for θ = {controlAngle}°</span>
+                </div>
+                <p className="text-amber-100/90 font-serif-editorial">
+                  {angleInsight.explanation}
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#261C15] border border-amber-900/50 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-cyan-300">
+                  <Target className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Level {level.id} Strategic Insight</span>
+                </div>
+                <p className="text-amber-100/90 font-serif-editorial">
+                  {angleInsight.strategy}
+                </p>
+              </div>
+            </div>
+
+            {/* Live Equation Substitution Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-xl bg-[#140E0A] border border-amber-950 text-[11px] font-mono text-amber-300/90">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-400 font-bold">Range Formula:</span>
+                <span>
+                  R = ({liveParams.velocity}² · sin(2 × {controlAngle}°)) / {level.gravity} ={' '}
+                  <strong className="text-yellow-300 font-black">{liveParams.theoreticalRange}m</strong>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-amber-400 font-bold">Apex Altitude:</span>
+                <span>
+                  H = ({liveParams.velocity}² · sin²({controlAngle}°)) / (2 × {level.gravity}) ={' '}
+                  <strong className="text-cyan-300 font-black">{liveParams.theoreticalApex}m</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── CONTROLS ROW: ANGLE SLIDER, POWER SLIDER, FIRE BUTTON ── */}
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            
+            {/* 1. Angle Control Module */}
+            <div className="flex-1 bg-[#1F1711] rounded-2xl p-3.5 border border-amber-900/60 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Compass className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-black tracking-wide uppercase text-amber-200">Launch Angle (θ)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`px-2.5 py-0.5 rounded-lg text-xs font-mono font-black border transition-all ${
+                    controlAngle >= level.optimalMin && controlAngle <= level.optimalMax
+                      ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-400/50 shadow-md shadow-emerald-950'
+                      : 'bg-amber-950 border-amber-800 text-amber-300'
+                  }`}>
+                    {controlAngle}°
+                  </span>
+                  {controlAngle >= level.optimalMin && controlAngle <= level.optimalMax && (
+                    <span className="text-[10px] font-black text-emerald-300 bg-emerald-900/90 border border-emerald-500/80 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                      ★ SWEET SPOT LOCKED
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Steppers & Slider */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleAngleChange(controlAngle - 1)}
+                  className="w-8 h-8 rounded-xl bg-[#3D2E24] hover:bg-[#523E30] active:scale-95 text-amber-200 flex items-center justify-center font-bold text-sm border border-amber-800/60 transition-all cursor-pointer shadow-sm"
+                  title="Decrease Angle 1°"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+
+                <input
+                  type="range"
+                  min="5"
+                  max="88"
+                  step="1"
+                  value={controlAngle}
+                  onChange={(e) => handleAngleChange(Number(e.target.value))}
+                  className="flex-1 accent-amber-500 h-2 bg-[#3D2E24] rounded-lg cursor-pointer"
+                />
+
+                <button
+                  onClick={() => handleAngleChange(controlAngle + 1)}
+                  className="w-8 h-8 rounded-xl bg-[#3D2E24] hover:bg-[#523E30] active:scale-95 text-amber-200 flex items-center justify-center font-bold text-sm border border-amber-800/60 transition-all cursor-pointer shadow-sm"
+                  title="Increase Angle 1°"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Angle Quick Presets */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                {[
+                  { deg: 45, label: '45° Max Range', isTarget: level.optimalAngle === 45 },
+                  { deg: 30, label: '30° Flat', isTarget: level.optimalAngle === 30 },
+                  { deg: 60, label: '60° High Lob', isTarget: level.optimalAngle === 60 },
+                  { deg: 74, label: '74° Bunker Drop', isTarget: level.optimalAngle === 74 || level.optimalAngle === 75 },
+                ].map((preset) => (
+                  <button
+                    key={preset.deg}
+                    onClick={() => handleAngleChange(preset.deg)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border flex items-center gap-1 ${
+                      controlAngle === preset.deg
+                        ? 'bg-amber-500 text-amber-950 border-amber-400 shadow-sm'
+                        : preset.isTarget
+                        ? 'bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border-emerald-600/70 ring-1 ring-emerald-500/30'
+                        : 'bg-[#2A1F17] hover:bg-[#3D2E24] text-amber-300/90 border-amber-900/60'
+                    }`}
+                  >
+                    {preset.isTarget && <span className="text-emerald-400">★</span>}
+                    <span>{preset.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Tension / Power Module */}
+            <div className="flex-1 bg-[#1F1711] rounded-2xl p-3.5 border border-amber-900/60 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs font-black tracking-wide uppercase text-amber-200">Tension Power (v₀)</span>
+                </div>
+                <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-amber-300">
+                  <span className={`px-2.5 py-0.5 rounded-lg border transition-all ${
+                    controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax
+                      ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-400/50 shadow-md shadow-emerald-950'
+                      : 'bg-amber-950 border-amber-800 text-amber-300'
+                  }`}>
+                    {controlPower}%
+                  </span>
+                  {controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax && (
+                    <span className="text-[10px] font-black text-emerald-300 bg-emerald-900/90 border border-emerald-500/80 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+                      ★ SWEET POWER
+                    </span>
+                  )}
+                  <span className="text-amber-400/80 text-[11px]">
+                    ({((controlPower / 100) * 32).toFixed(1)} m/s)
+                  </span>
+                </div>
+              </div>
+
+              {/* Steppers & Slider */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handlePowerChange(controlPower - 5)}
+                  className="w-8 h-8 rounded-xl bg-[#3D2E24] hover:bg-[#523E30] active:scale-95 text-amber-200 flex items-center justify-center font-bold text-sm border border-amber-800/60 transition-all cursor-pointer shadow-sm"
+                  title="Decrease Power 5%"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+
+                <input
+                  type="range"
+                  min="15"
+                  max="100"
+                  step="1"
+                  value={controlPower}
+                  onChange={(e) => handlePowerChange(Number(e.target.value))}
+                  className="flex-1 accent-amber-500 h-2 bg-[#3D2E24] rounded-lg cursor-pointer"
+                />
+
+                <button
+                  onClick={() => handlePowerChange(controlPower + 5)}
+                  className="w-8 h-8 rounded-xl bg-[#3D2E24] hover:bg-[#523E30] active:scale-95 text-amber-200 flex items-center justify-center font-bold text-sm border border-amber-800/60 transition-all cursor-pointer shadow-sm"
+                  title="Increase Power 5%"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Power Quick Presets */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                {[
+                  { pwr: level.optimalPower, label: `${level.optimalPower}% Target`, isTarget: true },
+                  { pwr: 40, label: '40% Short', isTarget: level.optimalPower === 40 },
+                  { pwr: 75, label: '75% Mid', isTarget: level.optimalPower === 75 },
+                  { pwr: 95, label: '95% Max', isTarget: level.optimalPower === 95 },
+                ]
+                  .filter((p, idx, arr) => arr.findIndex(x => x.pwr === p.pwr) === idx)
+                  .map((preset) => (
+                    <button
+                      key={preset.pwr}
+                      onClick={() => handlePowerChange(preset.pwr)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer border flex items-center gap-1 ${
+                        controlPower === preset.pwr
+                          ? 'bg-amber-500 text-amber-950 border-amber-400 shadow-sm'
+                          : preset.isTarget
+                          ? 'bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border-emerald-600/70 ring-1 ring-emerald-500/30'
+                          : 'bg-[#2A1F17] hover:bg-[#3D2E24] text-amber-300/90 border-amber-900/60'
+                      }`}
+                    >
+                      {preset.isTarget && <span className="text-emerald-400">★</span>}
+                      <span>{preset.label}</span>
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            {/* 3. Launch Fire Button & Live Prediction */}
+            <div className="w-full lg:w-64 bg-[#1F1711] rounded-2xl p-3.5 border border-amber-900/60 flex flex-col justify-between gap-3">
+              <div className="flex items-center justify-between text-[11px] text-amber-300/80 font-mono">
+                <span>Pred Range: <strong className="text-yellow-300">{liveParams.theoreticalRange}m</strong></span>
+                <span>Apex: <strong className="text-yellow-300">{liveParams.theoreticalApex}m</strong></span>
+              </div>
+
+              <button
+                onClick={fireCurrentShot}
+                disabled={Boolean(projectileRef.current?.active) || shotsLeft <= 0}
+                className={`w-full py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer ${
+                  Boolean(projectileRef.current?.active) || shotsLeft <= 0
+                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700'
+                    : controlAngle >= level.optimalMin &&
+                      controlAngle <= level.optimalMax &&
+                      controlPower >= level.optimalPowerMin &&
+                      controlPower <= level.optimalPowerMax
+                    ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600 hover:from-emerald-500 hover:to-teal-400 text-white border-2 border-emerald-300 shadow-xl shadow-emerald-950/70 hover:scale-[1.02] active:scale-95 animate-pulse'
+                    : 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-400 hover:to-yellow-400 text-amber-950 border border-yellow-300 shadow-amber-950/60 hover:scale-[1.02] active:scale-95'
+                }`}
+              >
+                <Target className="w-4 h-4" />
+                <span>
+                  {projectileRef.current?.active
+                    ? 'IN FLIGHT...'
+                    : shotsLeft <= 0
+                    ? 'NO CORES LEFT'
+                    : controlAngle >= level.optimalMin &&
+                      controlAngle <= level.optimalMax &&
+                      controlPower >= level.optimalPowerMin &&
+                      controlPower <= level.optimalPowerMax
+                    ? '★ FIRE SWEET SPOT! [ ⌖ LOCKED ]'
+                    : controlAngle >= level.optimalMin && controlAngle <= level.optimalMax
+                    ? `FIRE (${controlPower}% Power — Need ~${level.optimalPower}%)`
+                    : controlPower >= level.optimalPowerMin && controlPower <= level.optimalPowerMax
+                    ? `FIRE (${controlAngle}° — Need ~${level.optimalAngle}°)`
+                    : 'FIRE SLINGSHOT'}
+                </span>
+              </button>
+
+              <div className="text-center text-[10px] text-amber-400/60 font-semibold tracking-wider uppercase">
+                {shotsLeft} / {level.maxShots} Shots Remaining
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

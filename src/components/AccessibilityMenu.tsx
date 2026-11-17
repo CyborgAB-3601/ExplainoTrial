@@ -97,6 +97,8 @@ export const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
     activeCount,
     setBrailleSupport,
     setAslSupport,
+    setScreenNarrator,
+    toggleScreenNarrator,
     setHighContrast,
     setFontSize,
     setDyslexicFont,
@@ -507,36 +509,68 @@ export const AccessibilityMenu: React.FC<AccessibilityMenuProps> = ({
         )}
 
         {/* Audio & Speech Section */}
-        {matchesFilter('audio speech read aloud sound screen narrator') && (
-          <div className="p-3 rounded-2xl bg-white border border-slate-100/90 shadow-xs space-y-2">
+        {matchesFilter('audio speech read aloud sound screen narrator hover highlight') && (
+          <div className="p-3.5 rounded-2xl bg-white border border-slate-100/90 shadow-xs space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800">Screen Narrator</span>
-              <span className="text-[10px] text-slate-400">Web Speech API</span>
+              <div>
+                <span className="text-xs font-bold text-slate-800 block">Screen Narrator</span>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Hover on elements or highlight text to speak
+                </span>
+              </div>
+
+              {/* Narrator Toggle Switch */}
+              <button
+                onClick={toggleScreenNarrator}
+                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                  settings.screenNarrator ? 'bg-[#8E2856]' : 'bg-slate-200'
+                }`}
+                role="switch"
+                aria-checked={settings.screenNarrator}
+                title={settings.screenNarrator ? 'Click to turn off Screen Narrator' : 'Click to enable Screen Narrator'}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full bg-white shadow-xs absolute top-0.5 transition-transform ${
+                    settings.screenNarrator ? 'left-[22px]' : 'left-0.5'
+                  }`}
+                />
+              </button>
             </div>
 
+            {/* Main Toggle Button: Click to enable, click again to turn off */}
             <button
-              onClick={handleReadAloud}
-              className={`w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
-                isSpeaking
-                  ? 'bg-rose-500 hover:bg-rose-600 text-white animate-pulse'
+              onClick={toggleScreenNarrator}
+              className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+                settings.screenNarrator
+                  ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-rose-200 ring-2 ring-rose-300'
                   : 'bg-[#FAF2F6] hover:bg-[#F4E3ED] border border-[#8E2856]/30 text-[#8E2856]'
               }`}
             >
-              {isSpeaking ? (
+              {settings.screenNarrator ? (
                 <>
                   <VolumeX className="w-4 h-4" />
-                  <span>Stop Speaking</span>
+                  <span>Narrator Active • Click to Turn Off</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="w-4 h-4" />
-                  <span>Read Screen Aloud</span>
+                  <span>Enable Screen Narrator</span>
                 </>
               )}
             </button>
 
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[11px] text-slate-500 font-semibold">Speed</span>
+            {/* Quick Test / Read Aloud Button if needed */}
+            <button
+              onClick={handleReadAloud}
+              className="w-full py-1.5 px-2.5 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-slate-400" />
+              <span>{isSpeaking ? 'Stop Active Speech' : 'Sample: Read Current Lesson'}</span>
+            </button>
+
+            {/* Speech Rate Controls */}
+            <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+              <span className="text-[11px] text-slate-500 font-semibold">Narrator Speed</span>
               <div className="flex items-center gap-1 text-[10px] font-bold">
                 {([0.8, 1.0, 1.25] as SpeechRate[]).map((rate) => (
                   <button

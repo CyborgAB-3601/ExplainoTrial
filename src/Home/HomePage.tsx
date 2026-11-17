@@ -78,6 +78,212 @@ interface RadialNode {
   featureKey: 'chat' | 'resources' | 'next' | 'scratchpad' | 'video' | 'digitallab' | 'prev' | 'games';
 }
 
+interface FeatureGuideItem {
+  title: string;
+  badge: string;
+  badgeColor: string;
+  category: string;
+  description: string;
+  howToUse: string[];
+  proTip?: string;
+}
+
+export const FEATURE_GUIDES: Record<string, FeatureGuideItem> = {
+  'nilo-home': {
+    title: 'Nilo Home',
+    badge: 'Overview',
+    badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    category: 'Dashboard',
+    description: 'Central learning dashboard with Feynman radial wheel, study session queue, and real-time focus metrics.',
+    howToUse: [
+      'Click to reset your view and return to the main radial wheel.',
+      'Access all learning modules from the central circular navigation.',
+      'Check your recent study queue and daily focus statistics.',
+    ],
+    proTip: 'Clicking here cleanly collapses any open sub-menu.',
+  },
+  'pin-menu': {
+    title: 'Pin Radial Wheel',
+    badge: 'Quick Navigation',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    category: 'Radial Control',
+    description: 'Locks the 360° circular navigation wheel open so all 6 core learning tools stay visible without auto-collapsing.',
+    howToUse: [
+      'Click to lock the radial wheel in bloom mode.',
+      'Freely move your mouse across the screen without losing your tools.',
+      'Click again to unpin and allow automatic hover-bloom.',
+    ],
+    proTip: 'Perfect when jumping between tools and taking notes.',
+  },
+  'resources': {
+    title: 'Study Guides & 3D Books',
+    badge: 'Reference Library',
+    badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    category: 'Study Library',
+    description: 'Interactive 3D bookshelf containing high-yield textbook chapter summaries, formulas, and flashcards.',
+    howToUse: [
+      'Click to enter the 3D interactive book library.',
+      'Select subjects like Linear Equations, Cellular Biology, or Optics.',
+      'Review verified Feynman summaries and launch focused problem sets.',
+    ],
+    proTip: 'Drag to rotate 3D book covers and preview chapter outlines.',
+  },
+  'accessibility': {
+    title: 'Accessibility Options',
+    badge: 'Inclusive Suite',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    category: 'Accessibility',
+    description: 'Inclusive learning suite with Braille Nemeth math code, ASL sign language interpreter, and ADHD focus ruler.',
+    howToUse: [
+      'Click the person figure icon to open the accessibility menu.',
+      'Toggle Braille or ASL to view draggable floating helpers on canvas.',
+      'Enable Screen Narrator to speak text aloud when hovering or selecting.',
+    ],
+    proTip: 'All floating mini widgets can be dragged anywhere on screen.',
+  },
+  'add-task-rail': {
+    title: 'Create New Task',
+    badge: 'Task Manager',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    category: 'Productivity',
+    description: 'Quickly start a fresh study session, open a blank math sandbox, or log a new homework objective.',
+    howToUse: [
+      'Click + to instantly create a new task card in your queue.',
+      'Name your task and assign your preferred study mode.',
+      'Double-click the card in the list to jump right in.',
+    ],
+    proTip: 'Duplicate tasks to replicate past problem sets.',
+  },
+  'scratchpad': {
+    title: 'Math Sandbox',
+    badge: 'Canvas & AI Tutor',
+    badgeColor: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    category: 'STEM Tool',
+    description: 'Interactive digital chalkboard with freehand handwriting, step-by-step algebra hints, and instant equation verification.',
+    howToUse: [
+      'Double-click to open the full Math Sandbox whiteboard.',
+      'Use the Pen and Eraser tools to write equations or sketch graphs.',
+      'Ask the AI tutor in the right chat panel to verify your solution steps.',
+    ],
+    proTip: 'Toggle grid lines on the top toolbar for precise graphs.',
+  },
+  'video': {
+    title: 'Targeted Video Lessons',
+    badge: 'Micro-Lectures',
+    badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    category: 'Visual Learning',
+    description: 'Curated 3-5 minute animated concept lectures addressing specific knowledge gaps identified during study.',
+    howToUse: [
+      'Click to browse recommended concept animations for this topic.',
+      'Watch high-yield visual breakdowns of difficult mechanisms.',
+      'Complete the checkpoint question at the end to lock in retention.',
+    ],
+    proTip: 'Videos are automatically prioritized based on your weak spots.',
+  },
+  'digitallab': {
+    title: 'Digital Science Lab',
+    badge: 'Virtual Simulation',
+    badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+    category: 'Laboratory',
+    description: 'Interactive virtual science laboratory for running chemistry titrations, optics experiments, and physics simulations.',
+    howToUse: [
+      'Click to launch the 3D lab simulation apparatus.',
+      'Adjust interactive sliders for concentration, wavelength, or temperature.',
+      'Observe real-time simulated outputs and graph visualizations.',
+    ],
+    proTip: 'Use presets to quickly test standard textbook lab setups.',
+  },
+  'games': {
+    title: 'Arcade Math Games',
+    badge: 'Rhythm & Challenges',
+    badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    category: 'Gamified Practice',
+    description: 'Fast-paced gamified challenges (Geometry Dash Math) combining music rhythm with arithmetic and algebraic obstacles.',
+    howToUse: [
+      'Click to enter the Arcade room and choose your game mode.',
+      'Solve math checkpoints in rhythm to jump over hurdles.',
+      'Maintain lives and build streaks to unlock achievements.',
+    ],
+    proTip: 'Use Spacebar or Left Click to jump at checkpoints.',
+  },
+  'chat': {
+    title: 'Feynman AI Tutor Chat',
+    badge: 'Socratic Dialogue',
+    badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    category: 'AI Assistant',
+    description: 'Conversational dialogue agent that asks probing questions to help you explain concepts simply and find gaps.',
+    howToUse: [
+      'Open chat and type any difficult topic or problem.',
+      'Explain your reasoning; the AI evaluates conceptual clarity.',
+      'Follow guided hint breakdowns instead of getting direct answers.',
+    ],
+    proTip: 'Ask "Give me a practice problem" to test your mastery.',
+  },
+  'next': {
+    title: 'Next Topic: Calvin Cycle & Electron Transport',
+    badge: 'Curriculum Progression',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    category: 'Syllabus Navigator',
+    description: 'Advance forward in your learning path to the next sequential mastery module and problem sets.',
+    howToUse: [
+      'Click to queue the next syllabus module.',
+      'Auto-loads prerequisites and diagnostic practice questions.',
+      'Syncs your progress with course milestones.',
+    ],
+    proTip: 'Completing the current checkpoint unlocks bonus challenge problems in the next chapter.',
+  },
+  'prev': {
+    title: 'Previous Topic: Cellular Respiration Basics',
+    badge: 'Foundations Review',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    category: 'Prerequisite Refresh',
+    description: 'Jump back to review foundational concepts, previous chalkboard notes, and earlier quiz results.',
+    howToUse: [
+      'Click to review the previous chapter and foundational definitions.',
+      'Check your prior mastery score and whiteboard solutions.',
+      'Easily reinforce foundational concepts before continuing.',
+    ],
+    proTip: 'Quickly revisit earlier diagrams if you feel stuck on current concepts.',
+  },
+  'speak': {
+    title: 'Voice-First Feynman Session',
+    badge: 'Spoken AI Dialogue',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    category: 'Speech Verification',
+    description: 'Spoken dialogue with the holographic ExoOrb to practice verbal explanations and get instantaneous speech verification.',
+    howToUse: [
+      'Click the center ExoOrb to start talking.',
+      'Speak your explanation naturally out loud as if teaching a beginner.',
+      'Exo transcribes, analyzes, and responds with constructive audio guidance.',
+    ],
+    proTip: 'Wear headphones for optimal acoustic echo cancellation.',
+  },
+  'system-usage': {
+    title: 'Focus Guard & App Tracking',
+    badge: 'Focus Analytics',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    category: 'Productivity Guard',
+    description: 'Monitors background screen time on distracting applications during active study sessions to keep you in flow state.',
+    howToUse: [
+      'Review your daily breakdown of study vs entertainment apps.',
+      'Track hours spent on YouTube, Netflix, or social apps.',
+      'Set focus thresholds to maintain high study efficiency.',
+    ],
+    proTip: 'Focus Guard automatically pauses timers when you switch windows.',
+  },
+  'sign-out': {
+    title: 'Sign Out / Exit',
+    badge: 'Account',
+    badgeColor: 'bg-red-500/20 text-red-300 border-red-500/30',
+    category: 'Session',
+    description: 'Safely save your current session progress and return to the main welcome screen.',
+    howToUse: [
+      'Click to sign out of your account.',
+      'All your canvas sketches and task history are saved automatically.',
+    ],
+  },
+};
+
 export const HomePage: React.FC<HomePageProps> = ({
   userName = "Abhinav",
   onStartSession,
@@ -114,6 +320,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   // Debounced radial stage hover so moving between orb and sub-elements never accidentally closes
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nodeHoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Opening is strictly triggered ONLY when mouse is directly over the orb
   const handleOrbEnter = () => {
@@ -140,9 +347,14 @@ export const HomePage: React.FC<HomePageProps> = ({
       if (!isPinnedOpen) {
         setIsRadialMenuOpen(false);
         setIsCenterHovered(false);
-        setHoveredRadialNode(null);
       }
     }, 380);
+    if (nodeHoverTimerRef.current) {
+      clearTimeout(nodeHoverTimerRef.current);
+    }
+    nodeHoverTimerRef.current = setTimeout(() => {
+      setHoveredRadialNode(null);
+    }, 180);
   };
 
   useEffect(() => {
@@ -150,17 +362,11 @@ export const HomePage: React.FC<HomePageProps> = ({
       if (leaveTimerRef.current) {
         clearTimeout(leaveTimerRef.current);
       }
+      if (nodeHoverTimerRef.current) {
+        clearTimeout(nodeHoverTimerRef.current);
+      }
     };
   }, []);
-
-  // Inspector Panel State
-  const [menuBehaviorOpen, setMenuBehaviorOpen] = useState(false);
-  const [menuConditionsOpen, setMenuConditionsOpen] = useState(true);
-  const [limitApps, setLimitApps] = useState(false);
-  const [limitWindowTitles, setLimitWindowTitles] = useState(false);
-  const [limitScreenArea, setLimitScreenArea] = useState(false);
-  const [quickSelectKey, setQuickSelectKey] = useState('Backspace');
-  const [centerWorkflowAction, setCenterWorkflowAction] = useState('Close Menu');
 
   // 10 Recent Tasks across Nilo Services (Speak with Nilo, Scratchpad, Digital Lab, Books, etc.)
   const [tasks, setTasks] = useState<RecentTask[]>([
@@ -302,6 +508,14 @@ export const HomePage: React.FC<HomePageProps> = ({
     { id: 6, label: 'Previous Topic', angle: 270, icon: 'arrow-left', description: 'Review prerequisites', featureKey: 'prev' },
     { id: 7, label: 'Games', angle: 315, icon: 'games', description: 'Interactive concept arcade games', featureKey: 'games' },
   ];
+
+  // Currently inspected feature in the Right Inspector panel (swaps when hovering radial nodes around the orb)
+  const inspectedOrbNode = hoveredRadialNode !== null
+    ? radialNodes.find(n => n.id === hoveredRadialNode) || null
+    : null;
+  const inspectedOrbGuide = inspectedOrbNode
+    ? FEATURE_GUIDES[inspectedOrbNode.featureKey] || null
+    : null;
 
   // Radial geometry math - Scaled up generously for prominent presence
   const RADIUS = 236; // Distance from center in pixels
@@ -1037,7 +1251,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         {/* ── BOTTOM 30%: SYSTEM LEVEL APP USAGE (YOUTUBE, INSTAGRAM, NETFLIX) ── */}
-        <div className="h-[30%] flex flex-col min-h-0 bg-white/45 backdrop-blur-md px-3 pt-2.5 pb-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div
+          className="h-[30%] flex flex-col min-h-0 bg-white/45 backdrop-blur-md px-3 pt-2.5 pb-2 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           <div className="flex items-center justify-between pb-1 shrink-0">
             <div className="flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 text-purple-600" />
@@ -1300,9 +1516,21 @@ export const HomePage: React.FC<HomePageProps> = ({
                   clearTimeout(leaveTimerRef.current);
                   leaveTimerRef.current = null;
                 }
+                if (nodeHoverTimerRef.current) {
+                  clearTimeout(nodeHoverTimerRef.current);
+                  nodeHoverTimerRef.current = null;
+                }
                 setHoveredRadialNode(node.id);
+                setIsInspectorClosed(false);
               }}
-              onMouseLeave={() => setHoveredRadialNode(null)}
+              onMouseLeave={() => {
+                if (nodeHoverTimerRef.current) {
+                  clearTimeout(nodeHoverTimerRef.current);
+                }
+                nodeHoverTimerRef.current = setTimeout(() => {
+                  setHoveredRadialNode(null);
+                }, 240);
+              }}
               onClick={() => handleRadialClick(node)}
               className="absolute flex items-center justify-center cursor-pointer select-none group pointer-events-auto z-40"
               style={{
@@ -1526,242 +1754,182 @@ export const HomePage: React.FC<HomePageProps> = ({
       <aside className={`fixed top-0 right-0 w-80 h-full flex flex-col border-l border-[#EBE6F0] bg-white/65 backdrop-blur-xl z-20 transition-transform duration-600 ease-in-out ${(isMeltActive || isInspectorClosed) ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'
         }`}>
 
-        {/* Top Window Controls (—, □, ✕) */}
-        <div className="h-9 px-3 flex items-center justify-end gap-2 shrink-0">
-          <button
-            onClick={() => setIsInspectorClosed(true)}
-            className="w-4 h-4 rounded flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
-            title="Minimize"
-          >
-            <Minus className="w-3 h-3" />
-          </button>
-          <button
-            onClick={() => setIsInspectorClosed(false)}
-            className="w-4 h-4 rounded flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
-            title="Maximize"
-          >
-            <Square className="w-2.5 h-2.5" />
-          </button>
-          <button
-            onClick={() => setIsInspectorClosed(true)}
-            className="w-4 h-4 rounded flex items-center justify-center text-slate-500 hover:text-red-600 hover:bg-red-100/60 transition-colors cursor-pointer"
-            title="Close Inspector"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-
-        {/* Scrollable Inspector Body */}
-        <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-
-          {/* Header Preview Badge + Menu Title */}
-          <div className="flex flex-col items-center pt-2 text-center">
-            <div className="mb-2">
-              {renderServiceIcon(activeTask.serviceType, 'large')}
-            </div>
-
-            <h2 className="text-base font-extrabold tracking-tight text-[#1E1926]">
-              {activeTask.title}
-            </h2>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full">
-                {activeTask.service}
-              </span>
-              <span className="text-[11px] text-slate-400 font-medium">
-                {activeTask.timeAgo}
-              </span>
-            </div>
-
-            {/* Quick Open in Service Button */}
+          {/* Top Window Header */}
+          <div className="h-10 px-4 flex items-center justify-between border-b border-[#EBE6F0]/60 shrink-0">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              {inspectedOrbNode ? 'Feature Overview' : 'Task Details'}
+            </span>
             <button
-              onClick={() => handleOpenTask(activeTask)}
-              className="w-full mt-3 py-2 px-3 rounded-xl bg-gradient-to-r from-[#651A3B] to-[#8E2856] hover:from-[#50142e] hover:to-[#782249] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              onClick={() => setIsInspectorClosed(true)}
+              className="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Close Inspector"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Open in {activeTask.service}</span>
+              <X className="w-3.5 h-3.5" />
             </button>
-
-            <div className="flex items-center gap-1.5 mt-3 text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-              <span className="w-8 h-[1px] bg-slate-200" />
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-            </div>
           </div>
 
-          {/* Properties Form Rows */}
-          <div className="space-y-3 pt-2">
+          {/* Scrollable Inspector Body */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-            {/* Shortcut Input */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-semibold flex items-center gap-1">
-                Shortcut
-                <span className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-500 text-[10px] flex items-center justify-center font-bold">i</span>
-              </span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={activeMenu.shortcut}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setMenus(prev => prev.map(m => m.id === activeMenu.id ? { ...m, shortcut: val } : m));
-                  }}
-                  className="px-3 py-1 rounded-lg bg-white/90 border border-slate-200 text-slate-800 font-mono text-[11px] text-right focus:outline-none focus:border-purple-400 shadow-2xs"
-                />
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-800" />
-              </div>
-            </div>
+              {inspectedOrbNode ? (
+                /* ── ORB FEATURE PREVIEW (Active when hovering over orb radial nodes like Chat, Scratchpad, etc.) ── */
+                      <div className="space-y-4">
+                        {/* Centered Icon + Title + Meta */}
+                        <div className="flex flex-col items-center pt-2 pb-1 text-center">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#651A3B] to-[#8E2856] flex items-center justify-center shadow-md shadow-[#651A3B]/20 mb-3 text-white shrink-0">
+                            {renderRadialIcon(inspectedOrbNode.icon)}
+                          </div>
 
-            {/* Tags Input */}
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500 font-semibold flex items-center gap-1">
-                Tags
-                <span className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-500 text-[10px] flex items-center justify-center font-bold">i</span>
-              </span>
-              <div className="flex items-center gap-1.5">
-                {activeMenu.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-0.5 rounded-md bg-[#584D63] text-white text-[11px] font-medium flex items-center gap-1 shadow-2xs"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-300" />
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
+                            <h2 className="text-base font-extrabold tracking-tight text-[#1E1926] max-w-[260px] leading-snug min-h-[44px] flex items-center justify-center">
+                              {inspectedOrbGuide?.title || inspectedOrbNode.label}
+                            </h2>
 
-            {/* Collapsible Accordion: Menu Behavior */}
-            <div className="border-t border-slate-200/80 pt-2.5">
-              <button
-                onClick={() => setMenuBehaviorOpen(prev => !prev)}
-                className="w-full flex items-center justify-between text-xs font-bold text-slate-700 py-1 hover:text-purple-700 cursor-pointer"
-              >
-                <span>Menu Behavior</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${menuBehaviorOpen ? 'rotate-180' : 'rotate-0'}`} />
-              </button>
-            </div>
+                                <div className="flex items-center gap-1.5 mt-1.5 justify-center min-h-[22px]">
+                                  <span className="text-[11px] font-semibold text-[#8E2856] bg-[#8E2856]/8 px-2.5 py-0.5 rounded-full border border-[#8E2856]/15">
+                                    {inspectedOrbGuide?.badge || 'Study Tool'}
+                                  </span>
+                                  {inspectedOrbGuide?.category && (
+                                      <span className="text-[11px] text-slate-500 font-medium">
+                                        {inspectedOrbGuide.category}
+                                      </span>
+                  )}
+                                    </div>
 
-            {/* Collapsible Accordion: Menu Conditions */}
-            <div className="border-t border-slate-200/80 pt-2.5 space-y-2.5">
-              <button
-                onClick={() => setMenuConditionsOpen(prev => !prev)}
-                className="w-full flex items-center justify-between text-xs font-bold text-slate-700 py-1 hover:text-purple-700 cursor-pointer"
-              >
-                <span>Menu Conditions</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${menuConditionsOpen ? 'rotate-180' : 'rotate-0'}`} />
-              </button>
+                                  {/* Primary Action Button */}
+                                  <button
+                                    onClick={() => handleRadialClick(inspectedOrbNode)}
+                                    className="w-full mt-3.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#651A3B] to-[#8E2856] hover:from-[#541530] hover:to-[#792249] text-white font-bold text-xs shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                                  >
+                                    <Sparkles className="w-3.5 h-3.5 text-pink-200" />
+                                    <span>Launch {inspectedOrbNode.label}</span>
+                                    <ArrowRight className="w-3.5 h-3.5 ml-0.5 text-pink-200" />
+                                  </button>
+                                </div>
 
-              {menuConditionsOpen && (
-                <div className="space-y-2 text-[11px] text-slate-500">
-                  <p className="leading-relaxed">
-                    You can bind multiple menus to the same shortcut and then choose under which conditions each menu should be shown.
-                  </p>
+                                {/* Description Card */}
+                                    <div className="w-full p-4 rounded-2xl bg-white/70 border border-[#EBE6F0] space-y-1.5 text-left shadow-2xs">
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                                        Description
+                                      </span>
+                                      <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                                        {inspectedOrbGuide?.description || inspectedOrbNode.description}
+                                      </p>
+                                    </div>
 
-                  <div className="space-y-1.5 pt-1">
-                    {/* Toggle 1 */}
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-slate-600 font-medium">
-                        Limit to Specific Apps
-                        <span className="w-3 h-3 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center">i</span>
-                      </span>
-                      <button
-                        onClick={() => setLimitApps(prev => !prev)}
-                        className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${limitApps ? 'bg-purple-600' : 'bg-slate-200'
-                          }`}
-                      >
-                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${limitApps ? 'translate-x-4' : 'translate-x-0'
-                          }`} />
-                      </button>
-                    </div>
-
-                    {/* Toggle 2 */}
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-slate-600 font-medium">
-                        Limit to Specific Window Titles
-                        <span className="w-3 h-3 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center">i</span>
-                      </span>
-                      <button
-                        onClick={() => setLimitWindowTitles(prev => !prev)}
-                        className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${limitWindowTitles ? 'bg-purple-600' : 'bg-slate-200'
-                          }`}
-                      >
-                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${limitWindowTitles ? 'translate-x-4' : 'translate-x-0'
-                          }`} />
-                      </button>
-                    </div>
-
-                    {/* Toggle 3 */}
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-slate-600 font-medium">
-                        Limit to Specific Screen Area
-                        <span className="w-3 h-3 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center">i</span>
-                      </span>
-                      <button
-                        onClick={() => setLimitScreenArea(prev => !prev)}
-                        className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${limitScreenArea ? 'bg-purple-600' : 'bg-slate-200'
-                          }`}
-                      >
-                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${limitScreenArea ? 'translate-x-4' : 'translate-x-0'
-                          }`} />
-                      </button>
-                    </div>
-                  </div>
+                                    {/* Step-by-Step How To Use */}
+                                    {inspectedOrbGuide?.howToUse && inspectedOrbGuide.howToUse.length > 0 && (
+                                          <div className="w-full p-4 rounded-2xl bg-white/70 border border-[#EBE6F0] space-y-2 text-left shadow-2xs">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                                              How To Use
+                                            </span>
+                                              <div className="space-y-2 pt-0.5">
+                                                {inspectedOrbGuide.howToUse.map((step, idx) => (
+                                                      <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-600 leading-snug">
+                                                        <span className="w-4 h-4 rounded-full bg-[#8E2856]/10 text-[#8E2856] flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                                                          {idx + 1}
+                                                        </span>
+                                                        <span>{step}</span>
+                                                      </div>
+                    ))}
+                                                  </div>
                 </div>
               )}
-            </div>
 
-            {/* Center-Click Workflow Box */}
-            <div className="border border-slate-200/90 rounded-2xl p-3.5 bg-white/70 shadow-xs space-y-2.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                <span>Center-Click Workflow</span>
-              </div>
-              <p className="text-[11px] text-slate-500 leading-snug">
-                The actions below will be executed when you click the center of the root menu.
-              </p>
+                                              {/* Pro Tip */}
+                                              {inspectedOrbGuide?.proTip && (
+                                                  <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/50 text-xs text-amber-900/90 text-left">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block mb-1">
+                                                      Tip
+                                                    </span>
+                                                    <p className="leading-snug text-[11.5px] text-slate-700">
+                                                      {inspectedOrbGuide.proTip}
+                                                    </p>
+                                                  </div>
+              )}
+                                                </div>
+                                              ) : (
+            /* ── DEFAULT ACTIVE TASK INSPECTOR VIEW ("Photosynthesis & ATP Yield") ── */
+                                                    <div className="space-y-4">
+                                                      {/* Centered Icon + Title + Meta */}
+                                                      <div className="flex flex-col items-center pt-2 pb-1 text-center">
+                                                        <div className="w-14 h-14 flex items-center justify-center mb-3 shrink-0">
+                                                          {renderServiceIcon(activeTask.serviceType, 'large')}
+                                                        </div>
 
-              <div className="flex items-center justify-between text-xs pt-1">
-                <span className="text-slate-600 font-medium flex items-center gap-1">
-                  Quick-select key
-                  <span className="w-3 h-3 rounded-full bg-slate-200 text-slate-500 text-[9px] flex items-center justify-center">i</span>
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <span className="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">
-                    {quickSelectKey}
-                  </span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-800" />
-                </div>
-              </div>
+                                                          <h2 className="text-base font-extrabold tracking-tight text-[#1E1926] max-w-[260px] leading-snug min-h-[44px] flex items-center justify-center">
+                                                            {activeTask.title}
+                                                          </h2>
 
-              {/* Close Menu Pill */}
-              <div className="p-2 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs shadow-2xs">
-                <span className="text-slate-700 font-semibold flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full border-2 border-slate-400" />
-                  {centerWorkflowAction}
-                </span>
-                <button
-                  onClick={() => { }}
-                  className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                  title="Remove Action"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
+                                                              <div className="flex items-center gap-1.5 mt-1.5 justify-center min-h-[22px]">
+                                                                <span className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                                                                  {activeTask.service}
+                                                                </span>
+                                                                <span className="text-[11px] text-slate-400 font-medium">
+                                                                  {activeTask.timeAgo}
+                                                                </span>
+                                                              </div>
 
-              {/* + Add Action button */}
-              <button
-                onClick={() => { }}
-                className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200/70 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Action</span>
-              </button>
-            </div>
+                                                              {/* Primary Action Button */}
+                                                              <button
+                                                                onClick={() => handleOpenTask(activeTask)}
+                                                                className="w-full mt-3.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#651A3B] to-[#8E2856] hover:from-[#541530] hover:to-[#792249] text-white font-bold text-xs shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                                                              >
+                                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                                <span>Open in {activeTask.service}</span>
+                                                              </button>
+                                                          </div>
 
-          </div>
-        </div>
+                                                          {/* Clean Overview Card */}
+                                                          <div className="w-full p-4 rounded-2xl bg-white/70 border border-[#EBE6F0] space-y-1.5 text-left shadow-2xs">
+                                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                                                              Overview
+                                                            </span>
+                                                            <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                                                              {FEATURE_GUIDES[activeTask.serviceType]?.description ||
+                                                                'Interactive study session module designed for deep conceptual retention and step-by-step verification.'}
+                                                            </p>
+                                                          </div>
+
+                                                                    {/* Status & Details */}
+                                                                    <div className="w-full p-4 rounded-2xl bg-white/70 border border-[#EBE6F0] space-y-3 text-left shadow-2xs">
+                                                                      {activeTask.status && (
+                                                                        <div>
+                                                                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                                                                            Session Status
+                                                                          </span>
+                                                                          <div className="flex items-center gap-2">
+                                                                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                                                                            <span className="text-xs font-semibold text-slate-800">
+                                                                              {activeTask.status}
+                                                                            </span>
+                                                                          </div>
+                                                                        </div>
+                )}
+
+                                                                            {/* Tags */}
+                                                                            {activeTask.tags && activeTask.tags.length > 0 && (
+                                                                              <div>
+                                                                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+                                                                                  Subject Tags
+                                                                                </span>
+                                                                                  <div className="flex flex-wrap gap-1.5">
+                                                                                    {activeTask.tags.map((tag) => (
+                                                                                      <span
+                                                                                        key={tag}
+                                                                                        className="px-2.5 py-1 rounded-lg bg-slate-100/90 text-slate-600 text-[11px] font-medium border border-slate-200/60"
+                                                                                      >
+                                                                                        #{tag}
+                                                                                      </span>
+                                                                                    ))}
+                                                                                  </div>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+          )}
+                                                                  </div>
       </aside>
 
-    </div>
-  );
+                                                            </div>
+                                                            );
 };
