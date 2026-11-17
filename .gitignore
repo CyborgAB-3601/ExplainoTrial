@@ -1,23 +1,30 @@
+# ==========================================
 # Dependencies
+# ==========================================
 node_modules/
 /.pnp
 .pnp.js
 
+# ==========================================
 # Environment Variables & Secrets
+# (Never commit secrets to source control)
+# ==========================================
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 *.env
 
-# Production build outputs
+# ==========================================
+# Production Build Outputs
+# ==========================================
 dist/
 dist-ssr/
 build/
 *.local
 
-# Logs
+# ==========================================
+# Logs & Diagnostic Outputs
+# ==========================================
 logs/
 *.log
 npm-debug.log*
@@ -26,14 +33,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Editor & OS files
+# ==========================================
+# Testing & Coverage
+# ==========================================
+coverage/
+*.lcov
+.nyc_output/
+
+# ==========================================
+# IDE & Operating System Files
+# ==========================================
 .vscode/*
 !.vscode/extensions.json
 .idea/
+*.sublime-project
+*.sublime-workspace
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-Thumbs.db

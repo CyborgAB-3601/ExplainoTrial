@@ -22,7 +22,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSuccessSignup) {
-      onSuccessSignup(name || 'Student', email || 'student@explaino.ai');
+      onSuccessSignup(name || 'Student', email || 'student@nilo.ai');
     }
   };
 
@@ -47,7 +47,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({
             </div>
           </div>
           <span className="text-xl font-extrabold tracking-wide text-[#1E1B2E] font-sans">
-            EXPLAINO
+            NILO
           </span>
         </div>
 
@@ -105,7 +105,7 @@ export const SignupPage: React.FC<SignupPageProps> = ({
       {/* Headline */}
       <div className="text-center my-3">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1E1B2E]">
-          Create your <span className="text-gradient-brand">EXPLAINO</span> account
+          Create your <span className="text-gradient-brand">NILO</span> account
         </h1>
         <p className="text-sm text-[#6B7280] mt-1">
           Start your learning journey with EXO.

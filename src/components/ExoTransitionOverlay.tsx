@@ -92,13 +92,13 @@ export const ExoTransitionOverlay: React.FC<ExoTransitionOverlayProps> = ({
         })}
       </div>
 
-      {/* ================= TOP BRANDING: EXPLAINO ================= */}
+      {/* ================= TOP BRANDING: NILO ================= */}
       <header className="relative z-30 pt-4 sm:pt-6 pb-2 flex items-center justify-between w-full px-6 sm:px-10 shrink-0">
         <div className="flex-1" />
         
         {/* Centered Minimalist Logo Header */}
         <div className="flex items-center justify-center tracking-[0.4em] text-[11px] sm:text-xs font-black text-[#5B50A0]/80 uppercase">
-          EXPLAINO
+          NILO
         </div>
 
         {/* Quick Skip button at the far end */}

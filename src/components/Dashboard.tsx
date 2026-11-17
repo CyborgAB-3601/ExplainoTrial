@@ -405,7 +405,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   onMouseEnter={(e) => {
                     if (!isSidebarExpanded) {
                       const rect = e.currentTarget.getBoundingClientRect();
-                      setHoveredTooltip({ text: 'Explaino (Click to expand)', top: rect.top + rect.height / 2 });
+                      setHoveredTooltip({ text: 'Nilo (Click to expand)', top: rect.top + rect.height / 2 });
                     }
                   }}
                   onMouseLeave={() => setHoveredTooltip(null)}
@@ -434,7 +434,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         isSidebarExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none w-0 hidden'
                       }`}
                     >
-                      EXPLAINO
+                      NILO
                     </span>
                   </div>
 

@@ -1,306 +1,340 @@
-# 🧠 EXPLAINO — Explain What You Know
-> **Powered by EXO — Your Voice-Verifying AI Study Companion**
+# 🌌 NILO — The Agentic Operating System for Personalized Learning
+> **An autonomous, multi-modal desktop environment engineered to unlock deep mastery through Socratic dialogue, voice evaluation, live virtual simulations, and distraction-free cognitive focus.**
 
-[![React](https://img.shields.io/badge/React-19.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![AWS Ready](https://img.shields.io/badge/AWS-Amplify%20%7C%20S3%20%2B%20CloudFront-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
-
----
-
-## 📖 Table of Contents
-1. [Project Overview & Philosophy](#-project-overview--philosophy)
-2. [Key Screens & Features Built](#-key-screens--features-built)
-3. [The EXO Orb: 3D Mechanics & Mathematical Engine](#-the-exo-orb-3d-mechanics--mathematical-engine)
-4. [Application State & Routing Architecture](#-application-state--routing-architecture)
-5. [Codebase Directory Structure](#-codebase-directory-structure)
-6. [Tech Stack & Dependencies](#-tech-stack--dependencies)
-7. [Getting Started (Local Development)](#-getting-started-local-development)
-8. [AWS Cloud Deployment Guide](#-aws-cloud-deployment-guide)
-9. [Future Roadmap & Backend Integration (Bedrock / AI)](#-future-roadmap--backend-integration)
+[![React 19](https://img.shields.io/badge/React-19.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite 8](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TailwindCSS 3](https://img.shields.io/badge/TailwindCSS-3.4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🌟 Project Overview & Philosophy
-
-**Explaino** is a next-generation study platform engineered around the **Feynman Technique**: the principle that true mastery of a concept is proven when you can explain it simply in your own words.
-
-Instead of passive flashcards or multiple-choice quizzes, students vocally explain concepts to **EXO** — an empathetic, ethereal AI orb. Explaino analyzes the explanation, identifies hidden conceptual blindspots, builds personalized knowledge gap graphs, and guides the student to mastery.
-
----
-
-## 🖥️ Key Screens & Features Built
-
-### 1. Hero & Marketing Landing Page (`Hero.tsx`, `Navbar.tsx`, `FeaturesGrid.tsx`)
-- **Visual Design**: Ethereal frosted-glass aesthetic using a palette of soft lilacs (`#D8B4FE`), vibrant purples (`#7C5CFF`, `#A855F7`), warm pinks (`#F472B6`), and sky blues (`#38BDF8`).
-- **Ambient Stage**: Floating glowing bokeh orbs with subtle floating keyframe animations.
-- **Top Navigation Bar**: Minimalist header with the Explaino gradient logo, "How it works" / "Features" links, and a primary **"Login / Sign Up →"** action.
-- **Feature Cards Grid (3x2)**:
-  1. *Explain Anything*: Speak naturally to EXO via voice input.
-  2. *Find Knowledge Gaps*: AI pins down misinterpretations and missed premises.
-  3. *Personalized Learning Path*: Dynamically adapts based on detected knowledge gaps.
-  4. *Concept Maps*: Interactive visual knowledge graph linking prerequisites and masteries.
-  5. *Practice & Reinforce*: Targeted micro-challenges targeting specific weak areas.
-  6. *Track Progress*: Real-time confidence scores and topic mastery analytics.
-
-### 2. Unified Auth Experience (`LoginPage.tsx`)
-- **Single-Card Architecture**: Seamless toggle between **Login** and **Sign Up** within a single card (`[ Login | Sign Up ]`) without triggering full-page reloads or route disconnections.
-- **Interactive Companion & Email Inspection Mode**: Features a live EXO orb inside the page that tracks the user, blinks, and reacts dynamically to form inputs.
-- **Magnifying Glass Email Inspection**: When the user enters/focuses the email input field:
-  - EXO looks directly towards the input field.
-  - A metallic chrome magnifying glass smoothly springs up in front of the orb over the right eye.
-  - The right eye is magnified with an intensified neon purple bloom through the lens while the left eye remains visible, matching reference optics.
-  - The speech bubble dynamically reflects what the user is typing (`"Reading your email..."`).
-  - Clicking out of the field (`onBlur`) smoothly retracts the magnifying glass and returns EXO to normal idle/mouse-tracking companion behaviors.
-- **Password Privacy & Sneak-Peek Mode**: When entering the password field:
-  - EXO immediately turns its gaze away to the top-left with blushing pink cheeks (*"Shh... Secret password! I'm looking away! 🙈"*).
-  - Every 2.2 seconds, EXO playfully sneaks a peek toward the password field, winking with its right eye while peeking with its left eye (*"Just a tiny peek... I promise I didn't see! 🫣"*), before quickly snapping back to looking away.
-  - If the user clicks the eye icon to unmask the password, EXO covers both eyes in surprise (*"Password is revealed! Covering my eyes! 🙈"*).
-  - Clicking out of the field smoothly restores normal mouse-tracking companion actions.
-
-### 3. Student Dashboard / Home Page (`Dashboard.tsx`)
-- **Collapsible Dual-Drawer Layout**:
-  - **Left Sidebar**: Expandable/collapsible (`<<` / `>>`) navigation drawer featuring quick links to Dashboard, Subjects, Practice Arena, Knowledge Graph, Analytics, and Settings.
-  - **Right Activity Panel**: Expandable/collapsible drawer displaying study streaks (e.g., 5-day streak 🔥), weekly goal progress ring, scheduled live reviews, and recent knowledge gap alerts.
-- **Pro Welcome Hero**: Banner greeting the student with an orbiting mini-EXO, daily motivation, and quick "Resume Review" CTA.
-- **Interactive Subject Cards**: Grid showcasing active subjects (*Cell Biology*, *Thermodynamics*, *World History*, *Calculus I*) with mastery progress bars, topic counts, and "Continue" buttons.
-- **Clean Hero & Concentric Halo**: Centered 3D EXO Orb without distracting thought bubbles or "pro" badges.
-- **Scroll-Aware Floating Dock**: Seamlessly adapts when hero banner scrolls out of view.
-
-### 4. Cinematic Skydiving & Free-Fall Loading Screen (`ExoTransitionOverlay.tsx`)
-- **Aesthetic**: Recreated based on the high-altitude skydive reference design:
-  - **Sky & Clouds**: High-altitude daylight atmospheric sky gradient with soft pastel clouds, ambient light flares, and floating dreamy orbs.
-  - **Curved Earth Horizon**: Realistic spherical curve of planet Earth with deep blue oceans, emerald/green continents, atmosphere rim glow, and drifting cloud swirls.
-  - **Free-Falling EXO Orb**: Center-stage orb facing directly into the wind at terminal velocity.
-  - **Aerodynamic Goggles & Expressions**: Sleek white ski/skydiving goggles with polarized iridescent visor reflection and cute squinting eyes (`< >`) reacting to the high-speed air rush.
-  - **Wind & Aerodynamic Elements**: Translucent white slipstream vapor trails swirling upward around both sides of the orb, high-speed vertical wind streak particles, and rapid micro-buffeting vibration against air resistance.
-  - **Gradient Motion Graphic Typography**:
-    > **"Let's Learn by Explaining"**
-    Rendered with continuous fluid gradient shimmer flow, glowing drop bloom, subtitle topic indicator, and an ethereal progress pill capsule.
-
-### 5. Interactive Voice & Concept Chat Workspace (`ChatSession.tsx`)
-- **Viewport-Locked Layout (No Double Scrollbars)**:
-  - Full-screen `fixed inset-0` architecture with `shrink-0` header and bottom voice dock.
-  - Body scroll lock automatically prevents secondary document scrollbars.
-  - Single sleek scrollable conversation stream with thin custom scrollbars (`[scrollbar-width:thin]`).
-- **Concept Status & Stepper (Right Sidebar)**:
-  - Subject tracker (*Photosynthesis 60%*) with 5-step milestone timeline (*Introduction*, *Inputs*, *Process*, *Outputs*, *Importance*).
-  - Key points checklist with colored indicator dots.
-  - Interactive resource downloads (*Chapter Notes*, *Video Explanation*).
-- **Interactive Concept Card**:
-  - Full-color vector diagram depicting photosynthesis: Sunlight, Water ($H_2O$), Carbon Dioxide ($CO_2$), Glucose, and Oxygen ($O_2$).
-  - Quick action chips (*"Explain in more detail →"*, *"Show real example →"*, *"Generate quiz →"*).
-- **Central Voice Hub with Bilateral Reactive Soundwaves**:
-  - Floating EXO Orb on a concentric ripple pedestal with an ethereal floating question mark (`?`).
-  - **Bilateral dynamic equalizer soundwaves**: magenta/purple waves on the left and cyan/blue waves on the right that actively dance with randomized amplitude pulses when the microphone is toggled.
-- **Floating Pill Dock**:
-  - Direct keyboard input ("*Type or speak to EXO...*").
-  - Iridescent glowing central microphone button.
-  - Quick utility actions: Camera video sharing, File upload, and Expanded options.
+## 📑 Table of Contents
+1. [The Vision: Why an Agentic Learning OS?](#-the-vision-why-an-agentic-learning-os)
+2. [Architectural Blueprint of the OS](#-architectural-blueprint-of-the-os)
+3. [The Core Mascot: The Living EXO Orb](#-the-core-mascot-the-living-exo-orb)
+4. [Modular Learning Services (The 6 Pillars)](#-modular-learning-services-the-6-pillars)
+   - [Pillar 1: Socratic Chat Partner](#1-socratic-chat-partner-chat)
+   - [Pillar 2: Conversational Feynman Voice Agent](#2-conversational-feynman-voice-agent-voice)
+   - [Pillar 3: Digital Lab & Interactive Simulations](#3-digital-lab--interactive-simulations-digitallab)
+   - [Pillar 4: Scratchpad (Scribble Math Canvas)](#4-scratchpad-scribble-math-canvas-scratchpad)
+   - [Pillar 5: Concept Games Arcade](#5-concept-games-arcade-games)
+   - [Pillar 6: Books & 3D Interactive Library](#6-books--3d-interactive-library-resources)
+5. [System-Level Controls & Distraction Blocker (Focus Guard)](#-system-level-controls--distraction-blocker-focus-guard)
+6. [Universal Accessibility & Neurodivergent Adaptation](#-universal-accessibility--neurodivergent-adaptation)
+7. [How Nilo Ensures Personalized Learning for Every Student](#-how-nilo-ensures-personalized-learning-for-every-student)
+8. [Codebase Organization & File System Hierarchy](#-codebase-organization--file-system-hierarchy)
+9. [Getting Started & Local Development](#-getting-started--local-development)
+10. [Roadmap: From Prototype to Native Agentic OS Kernel](#-roadmap-from-prototype-to-native-agentic-os-kernel)
 
 ---
 
+## 💡 The Vision: Why an Agentic Learning OS?
 
-## 🔮 The EXO Orb: 3D Mechanics & Mathematical Engine
+Traditional learning tools are fragmented web pages: static flashcards, passive video feeds, and text-dump chatbots that provide ready-made answers without stimulating original thought.
 
-The core mascot of Explaino is **EXO** ([`src/components/ExoOrb.tsx`](file:///d:/Explaino/src/components/ExoOrb.tsx)). It combines frosted-glass shader aesthetics with continuous spherical coordinate projections.
-
-### 1. Aesthetic Construction
-- **Diffused Frosted Glass**: Built using multi-stop radial gradients layered with top specular arc highlights (`-rotate-12` gloss highlight) and subtle backdrop-blur.
-- **Soft Interior Highlights**: Layered cyan-blue (`rgba(96, 165, 250, 0.85)`) on the bottom-left and peach-pink (`rgba(244, 114, 182, 0.85)`) on the right that gently shift with mouse parallax.
-- **Neon Eye Bloom**: Signature thick white upward chevrons (`^ ^`) rendered with multi-tiered CSS `drop-shadow` filters creating a vibrant purple-pink bloom (`#FFFFFF` $\to$ `#D8B4FE` $\to$ `#A855F7` $\to$ `#EC4899`).
-- **Expressions**: Natural intermittent blinking (160ms scale down on Y axis), occasional winks with glowing pink cheek blush, and joyful squish-and-stretch jumps.
-
-### 2. Seamless Gaze-Based 360° Spherical Revolution
-A common problem with CSS 3D rotations is that applying `rotateY(360deg)` to a container flattens the sphere into a 2D disc/coin during rotation. Furthermore, initiating rotation while looking in a direction (e.g., looking right) often causes an abrupt snap back to center. 
-
-**ExoOrb solves this with spherical coordinate mathematics:**
+**Nilo is fundamentally different.** It is designed as an **Agentic Operating System (Agentic OS)**:
+- **Autonomous & Proactive**: An environment where the AI companion doesn't just wait for prompts, but actively diagnoses understanding, spots hidden knowledge gaps, and dynamically orchestrates personalized remedial micro-lessons.
+- **Feynman-First Philosophy**: Grounded in the principle that *“If you cannot explain it simply, you do not understand it well enough.”* Nilo requires students to verbalize concepts, sketch derivations, and experiment in simulations to prove true cognitive mastery.
+- **Unified Workspace Experience**: By embedding navigation into an ergonomic 8-way radial bloom menu, integrating task switching across 10 dynamically updated service sessions, and establishing system-level distraction boundaries, Nilo turns the user's computer into a dedicated, calm, flow-state learning terminal.
 
 ```
-                  Top View of Orb Sphere
-                          Z+ (Front)
-                             ▲
-                         0° / Center
-                             │
-       -90° (Left Horizon) ──┼── +90° (Right Horizon)
-                             │
-                             ▼
-                         Z- (Back)
+                      ┌──────────────────────────────────────────────┐
+                      │             NILO AGENTIC OS KERNEL           │
+                      └──────────────────────┬───────────────────────┘
+                                             │
+      ┌──────────────────────┬───────────────┴──────────────┬──────────────────────┐
+      ▼                      ▼                              ▼                      ▼
+┌─────────────┐     ┌──────────────────┐           ┌──────────────────┐     ┌─────────────┐
+│ Socratic    │     │ Feynman Oral     │           │ Digital Lab      │     │ Scribble    │
+│ Chat Engine │     │ Voice Evaluator  │           │ Simulations      │     │ Canvas      │
+└─────────────┘     └──────────────────┘           └──────────────────┘     └─────────────┘
+      │                      │                              │                      │
+      └──────────────────────┼──────────────────────────────┼──────────────────────┘
+                             ▼                              ▼
+                    ┌──────────────────┐           ┌──────────────────┐
+                    │ Concept Games    │           │ 3D Library &     │
+                    │ Arcade           │           │ Study Resources  │
+                    └──────────────────┘           └──────────────────┘
 ```
-
-1. **Origin Angle Capture ($\theta_0$)**:
-   When the rotation begins, the starting horizontal angle is calculated directly from the active mouse gaze without resetting:
-   $$\theta_0 = \arcsin\left(\text{clamp}(\text{mouseX} \cdot 0.45, -0.85, 0.85)\right)$$
-
-2. **Continuous Angular Interpolation**:
-   Over the course of the 2.1-second turn with quintic/cubic easing $p \in [0, 1]$, the trajectory smoothly shifts from the initial gaze $\theta_0$ to the active mouse position $\theta_{\text{mouse}}$ while completing a full $2\pi$ radian revolution:
-   $$\theta(t) = (1 - p)\theta_0 + p\theta_{\text{mouse}} + 2\pi p$$
-
-3. **Spherical Projection & Foreshortening**:
-   - **Horizontal Displacement**: $X = R \cdot \sin(\theta)$
-   - **Perspective Foreshortening**: $\text{scaleX} = |\cos(\theta)|$ (the eyes naturally compress as they approach the horizon and expand in the center).
-   - **Back-Hemisphere Occlusion**: When $\cos(\theta) < -0.12$, the eyes pass behind the frosted core and fade out naturally:
-     $$\text{opacity} = \text{clamp}\left((\cos(\theta) + 0.12) \times 3, 0, 1\right)$$
-   - **Zero-Discontinuity Resolution**: At $p = 1$, $\theta = \theta_{\text{mouse}} + 2\pi$, which mathematically produces the exact same position, scale, and opacity as the idle mouse state. The orb transitions seamlessly back to active tracking without snapping or popping.
-
-4. **Decoupled Animation Hierarchy**:
-   The vertical jump animation (`@keyframes orbCuteJump`) is applied to an outer container, while mouse orientation and spherical projection are applied to inner layers. This prevents vertical animations from canceling or popping horizontal gaze transforms mid-air.
 
 ---
 
-## 🏗️ Application State & Routing Architecture
+## 🏛️ Architectural Blueprint of the OS
 
-Explaino uses a streamlined state router inside [`src/App.tsx`](file:///d:/Explaino/src/App.tsx) for snappy transitions:
+The Nilo desktop environment is divided into four synchronized layers:
+
+```
++---------------------------------------------------------------------------------------+
+|  [ Rail ]  |  [ Task Stream ]  |                   [ Active Stage ]                   |
+|   52px     |      260px        |               Dynamic Window Canvas                  |
+|------------+-------------------+------------------------------------------------------|
+| • Nilo Hub | Recent Tasks (10) |  • 8-Way Ergonomic Radial Menu (Kando-inspired bloom) |
+| • Pin Menu | - Photosynthesis  |  • Living EXO Orb (Voice gateway & emotional anchor)  |
+| • Books    | - Quadratic Roots |  • Full-Screen Modal Overlay (Chat, Lab, Canvas, etc)|
+| • Add Task | - O2 Sandbox      |------------------------------------------------------|
+| • Sign Out | - CBSE Ch 6       |               [ Right Inspector Panel ]              |
+|            | - Math Dash       |  Shortcut binds, condition toggles, action workflows |
++---------------------------------------------------------------------------------------+
+```
+
+1. **Extreme Left Vertical Rail (52px)**: Persistent hardware-like utility dock for pinning the radial menu, jumping to the 3D library, quickly instantiating new academic tasks, and accessing authentication settings.
+2. **Recent Tasks Stream (260px)**: An intelligent multitasking memory buffer displaying the **10 most recent learning sessions** across Nilo services with real-time relative timestamps, shortcut triggers, mastery indicators, and one-click resumption.
+3. **The Active Radial Stage**: Centered on the living **EXO Orb**, featuring an 8-directional bloom menu that unlocks sub-services on hover or hotkey without cluttering the screen with traditional nested navigation bars.
+4. **Right Inspector Panel (320px)**: Deep configuration pane showing task properties, quick-select keys (`Backspace`, `Control+Space`), execution triggers, and system-level focus conditions.
+
+---
+
+## 🔮 The Core Mascot: The Living EXO Orb
+
+At the heart of Nilo is **EXO** ([`src/components/ExoOrb.tsx`](file:///d:/Explaino/src/components/ExoOrb.tsx)), a living, emotionally responsive 3D sphere that serves as the student's personal study companion.
+
+```
+                  Top View of Orb Spherical Projection
+                               Z+ (Front)
+                                   ▲
+                               0° / Center
+                                   │
+             -90° (Left Horizon) ──┼── +90° (Right Horizon)
+                                   │
+                                   ▼
+                               Z- (Back)
+```
+
+### Key Technical Mechanics:
+- **Gaze-Driven 360° Spherical Math**: Unlike flat CSS discs, EXO uses genuine spherical coordinate projections ($\theta_0 = \arcsin(\text{clamp}(\text{mouseX} \cdot 0.45, -0.85, 0.85))$). During full revolutions, the eyes foreshorten using perspective scaling ($|\cos\theta|$) and naturally pass behind the frosted core when moving across the back hemisphere.
+- **Dynamic Interaction Phases**:
+  - **Ambient Idle**: Gently floats with subtle breathing animations and soft multi-layered purple/cyan light flares.
+  - **Inspection Mode**: When focusing on email or text fields, EXO leans in and inspects the text through an animated metallic magnifying glass.
+  - **Privacy Guard**: When password fields are active, EXO shyly looks away to the top-left, occasionally sneaking a playful 1-second peek.
+  - **Living Voice Drop**: When clicked, EXO undergoes a fluid physical drop animation (`sliding` $\to$ `peeping`), resting along the bottom bezel as a half-peeping voice partner with bilateral reactive soundwaves.
+
+---
+
+## 🚀 Modular Learning Services (The 6 Pillars)
+
+Nilo’s features are modularized into independent domain folders under `src/`, allowing students and developers to navigate or expand each service independently.
+
+### 1. Socratic Chat Partner (`src/Chat/`)
+- **Pedagogical Premise**: Rather than acting as a homework generator that writes answers for students, the Chat Partner practices genuine **Socratic dialogue**.
+- **Capabilities**:
+  - Probes student assumptions with targeted counter-questions.
+  - Identifies intermediate logic errors before students arrive at incorrect conclusions.
+  - Generates ASCII & SVG conceptual diagrams inline to ground abstract ideas in concrete visuals.
+  - Dynamically modulates conversational complexity from middle school to university undergraduate rigor.
+
+### 2. Conversational Feynman Voice Agent (`src/Voice/`)
+- **Pedagogical Premise**: Speaking an explanation aloud forces the brain to bridge the gap between superficial recognition and deep understanding.
+- **Capabilities**:
+  - **Bilateral Reactive Audio Equalizer**: Displays dynamic real-time soundwaves (magenta on the left, cyan on the right) tuned to the speaker's vocal frequency.
+  - **Instant Semantic Verification Engine**: Transcribes oral statements in real-time and evaluates them across three core metrics: *Conceptual Accuracy*, *Explanatory Completeness*, and *Jargon-Free Clarity*.
+  - **Diagnostic Breakdown**: Automatically segments feedback into **"What You Got Right"** (green glow badges) and **"Misconceptions & Gaps"** (amber warnings detailing exact omissions).
+  - **Autonomous Knowledge Graph**: Real-time generation of prerequisite and mastery nodes reflecting the student's mastery of the topic.
+
+### 3. Digital Lab & Interactive Simulations (`src/DigitalLab/`)
+- **Pedagogical Premise**: Abstract scientific formulas become intuitive when students can directly manipulate physical variables and observe immediate reactions.
+- **Simulations Included**:
+  - **Physics (Kinematics, Electromagnetism, Optics)**: Adjust pendulum length, projectile velocity, magnetic field strength, and lens refractive index in real-time.
+  - **Chemistry (Titration & Kinetics)**: Virtual buret and pH sensor sandbox displaying instantaneous acid-base neutralization curves and indicator color shifts.
+  - **Biology (Enzymatic Rate & Photosynthesis)**: Tweak light intensity, temperature, and $CO_2$ saturation to monitor real-time ATP and $O_2$ bubble production rates.
+  - **Computer Science & Algorithms**: Live visualization of sorting algorithms, graph traversals, and memory stack execution.
+
+### 4. Scratchpad: Scribble Math Canvas (`src/Scratchpad/`)
+- **Pedagogical Premise**: Math and derivations require freehand scratching, visual exploration, and step-by-step validation.
+- **Capabilities**:
+  - Full-screen drawing canvas equipped with pen, highlighter, eraser, line tools, and coordinate grid backdrops.
+  - **Split-Screen AI Tutor**: Displays the live whiteboard on the left alongside an interactive chat tutor on the right.
+  - **Step-by-Step Solver**: When solving an equation (e.g. $2x + 5 = 15$), the AI highlights individual derivation lines on the canvas, confirms correct steps ($2x = 10 \implies x = 5$), and flags arithmetic missteps directly in place.
+
+### 5. Concept Games Arcade (`src/Games/`)
+- **Pedagogical Premise**: Gamification bridges the gap between study fatigue and high-engagement flow state.
+- **Mechanics**:
+  - **Geometry Dash Math**: Fast-paced obstacle runner where jumping over barriers requires quick mental calculations and rhythm synchronization.
+  - **Fraction Slicers & Orbit Velocity**: High-speed physical puzzles that train spatial intuition and numerical fluency.
+  - **XP & Streak Architecture**: Daily streak tracking, level milestones, collectible badges, and arcade trophies.
+
+### 6. Books & 3D Interactive Library (`src/Resources/`)
+- **Pedagogical Premise**: Curated, authoritative textbooks and verified formula sheets must always be accessible without leaving the study terminal.
+- **Capabilities**:
+  - 3D interactive bookshelf layout organizing NCERT, CBSE, AP, and University reference texts.
+  - One-click book inspection and chapter jump.
+  - Verified formula sheets and quick-reference cheat sheets categorized by topic.
+
+---
+
+## 🛡️ System-Level Controls & Distraction Blocker (Focus Guard)
+
+To preserve deep flow states, Nilo features system-level focus conditions integrated into its Inspector panel:
 
 ```mermaid
-graph TD
-    A[Hero Page - 'hero'] -->|Click 'Login'| B[Unified Auth Page - 'auth' mode: 'login']
-    A -->|Click 'Start Learning Free'| C[Unified Auth Page - 'auth' mode: 'signup']
-    B <-->|In-Card Toggle Tab| C
-    B -->|Submit / Social Auth| D[Student Dashboard - 'dashboard']
-    C -->|Submit / Social Auth| D
-    D -->|Click 'Log out'| A
+flowchart TD
+    A[Student Initiates Study Session] --> B{Focus Guard Enabled?}
+    B -- Yes --> C[Limit to Specific Apps]
+    B -- Yes --> D[Limit to Specific Window Titles]
+    B -- Yes --> E[Limit to Specific Screen Area]
+    C --> F[Suppress Notifications & Background App Switches]
+    D --> G[Block Distracting Browser Tabs & Non-Study Windows]
+    E --> H[Snap Nilo to Dedicated Canvas / Multi-Monitor Region]
+    F & G & H --> I[Full Deep Flow State Reached]
+    B -- No --> J[Standard Desktop Multi-Tasking]
 ```
 
-- **`currentPage`**: `'hero' | 'auth' | 'dashboard'`
-- **`authInitialMode`**: `'login' | 'signup'` (controls active tab inside `LoginPage`)
-- **`currentUser`**: Tracks active authenticated profile (`name`, `email`)
-- **Toast Notifications**: Built-in floating feedback banners with auto-dismissal.
+1. **Limit to Specific Apps**: When toggled, the OS environment restricts hotkey bindings and window focus strictly to authorized educational tools, suppressing background notifications and third-party distractions.
+2. **Limit to Specific Window Titles**: Allows users to specify keyword filters (e.g., `"Physics"`, `"NCERT"`, `"Canvas"`) so that browsing to unauthorized URLs or entertainment sites triggers a gentle refocus alert from EXO.
+3. **Limit to Specific Screen Area**: Binds Nilo's radial menu, living companion, and study windows to a user-designated screen coordinate box, perfect for split-screen setups alongside lecture slides or PDF viewers.
+4. **Ergonomic Quick-Select Hotkeys**:
+   - `Control + Space`: Instant root menu summon.
+   - `Backspace`: Instant menu collapse / dismiss.
+   - `Control + 1` through `Control + 0`: Instant jump to any of the 10 recent tasks.
 
 ---
 
-## 📁 Codebase Directory Structure
+## ♿ Universal Accessibility & Neurodivergent Adaptation
+
+Nilo is built to ensure that **every learner**, regardless of cognitive profile or physical ability, can study in the way that suits them best:
+
+| Feature / Need | Implementation in Nilo | Targeted Benefit |
+| :--- | :--- | :--- |
+| **ADHD / Executive Function** | Distraction-free radial UI, zero cognitive clutter, clear 10-task recent memory buffer, and micro-interval progress alerts. | Prevents cognitive overload, reduces task-switching friction, and maintains flow state. |
+| **Dyslexia & Reading Difficulties** | High-contrast font toggles, clean spacing, text-to-speech with natural cadence, and dual-modality diagram generation. | Eliminates text density barriers by translating written content into spoken dialogue and visual representations. |
+| **Autism Spectrum (ASD)** | Predictable, calm pastel color palette (`#FDFBF7`, `#FAF2F6`), adjustable sensory effects, and non-judgmental conversational pacing. | Provides a safe, low-stress, emotionally reassuring learning environment. |
+| **Motor & Visual Impairment** | 100% keyboard-navigable interface, prominent ARIA accessibility labels, screen reader integration, and adjustable font/icon scaling. | Enables complete hands-free or keyboard-only operation across all radial nodes and services. |
+| **Cognitive Fatigue Monitoring** | EXO monitors active session duration and explanation velocity, suggesting timely hydration and mental refresh intervals. | Prevents burnout and sustains long-term retention. |
+
+---
+
+## 🎯 How Nilo Ensures Personalized Learning for Every Student
+
+Every student learns differently. Nilo’s agentic core adapts dynamically to four primary learning modalities (VARK):
+
+```
+                                  STUDENT LEARNING STYLE
+                                            │
+         ┌──────────────────┬───────────────┴───────────────┬──────────────────┐
+         ▼                  ▼                               ▼                  ▼
+   [ Visual ]         [ Auditory ]                    [ Kinesthetic ]    [ Reading/Writing ]
+         │                  │                               │                  │
+         ▼                  ▼                               ▼                  ▼
+• Digital Lab      • Feynman Voice Agent            • Concept Games    • Socratic Chat
+  Simulations        Oral Evaluation                  Arcade             Dialogue
+• Scratchpad       • Spoken Explanations            • Interactive Lab  • Books & Study
+  Diagrams           & Podcast Summaries              Sliders            Guides
+```
+
+- **Non-Linear Navigation**: Students are never forced through rigid, one-size-fits-all curricula. They can dive straight into a simulation, switch to a math canvas, review textbook notes, or test themselves orally with EXO at any moment.
+- **Dynamic Curriculum Alignment**: Ready-to-adapt syllabus nodes for international standards including **CBSE (Class 9–12)**, **AP (Advanced Placement)**, **IB (International Baccalaureate)**, and university-level foundational STEM.
+- **Zero Judgment, Infinite Patience**: EXO provides an infinitely patient sandbox where mistakes are celebrated as diagnostic milestones rather than failures.
+
+---
+
+## 📁 Codebase Organization & File System Hierarchy
 
 ```
 d:/Explaino/
-├── amplify.yml                 # AWS Amplify Hosting configuration
-├── index.html                  # HTML entry point with fonts & meta tags
-├── package.json                # Project dependencies and npm scripts
-├── postcss.config.js           # PostCSS configuration for Tailwind
-├── tailwind.config.js          # Tailwind styling system tokens & themes
-├── tsconfig.json               # TypeScript configuration
-├── vite.config.ts              # Vite 8 build tool configuration
+├── index.html                      # HTML entry point with meta tags & typography
+├── package.json                    # Project dependencies & scripts
+├── vite.config.ts                  # Vite 8 build tool configuration
+├── tailwind.config.js              # Custom Tailwind tokens, glassmorphism, & theme colors
+├── tsconfig.json                   # Strict TypeScript configuration
 │
 └── src/
-    ├── App.tsx                 # Root application state & page router
-    ├── main.tsx                # React DOM root mounting
-    ├── index.css               # Global styles, keyframe animations, & utilities
-    ├── vite-env.d.ts           # Vite type declarations
+    ├── App.tsx                     # Top-level state orchestrator & view controller
+    ├── main.tsx                    # React 19 DOM entry mount
+    ├── index.css                   # Global glassmorphism, keyframe animations, & utilities
     │
-    └── components/
-        ├── BackgroundWaves.tsx # Ambient SVG background gradients & light waves
-        ├── Navbar.tsx          # Clean top navigation with CTA
-        ├── Hero.tsx            # Hero presentation banner with CTAs
-        ├── FeaturesGrid.tsx    # 3x2 feature cards grid matching the PRD
-        ├── LoginPage.tsx       # Unified Auth Card (Login <-> Sign Up toggle)
-        ├── Dashboard.tsx       # Student dashboard with collapsible drawers
-        ├── ExoOrb.tsx          # Core EXO mascot with 3D spherical math
-        └── ExoOrb3D.tsx        # Alternative Three.js WebGL implementation
+    ├── Home/
+    │   └── HomePage.tsx            # Main OS desktop: radial bloom menu, recent tasks, & inspector
+    │
+    ├── Chat/
+    │   └── ChatView.tsx            # Socratic dialogue tutor with step reasoning
+    │
+    ├── Voice/
+    │   └── VoiceAgent.tsx          # Real-time Feynman voice evaluator & audio waveform engine
+    │
+    ├── DigitalLab/
+    │   └── DigitalLabView.tsx      # Virtual simulation workbench (Bio, Chem, Physics, CS)
+    │
+    ├── Scratchpad/
+    │   └── ScratchpadView.tsx      # Multimodal math whiteboard & step-by-step solver
+    │
+    ├── Games/
+    │   └── GamesView.tsx           # Concept arcade minigames (Geometry Dash Math)
+    │
+    ├── Resources/
+    │   └── ResourcesView.tsx       # 3D study guides, NCERT books, & formula library
+    │
+    ├── Video/
+    │   └── VideoLessonsView.tsx    # Targeted visual micro-concept remediation clips
+    │
+    ├── components/
+    │   ├── ExoOrb.tsx              # Living 3D mascot with spherical coordinates & eye bloom
+    │   ├── ExoOrb3D.tsx            # Three.js WebGL experimental orb alternative
+    │   ├── ExoTransitionOverlay.tsx # High-altitude skydiving cinematic loading screen
+    │   ├── LoginPage.tsx           # Unified single-card auth with interactive companion
+    │   ├── Dashboard.tsx           # Multi-drawer student dashboard
+    │   ├── Hero.tsx                # Marketing presentation showcase
+    │   ├── Navbar.tsx              # Clean top navigation header
+    │   └── FeaturesGrid.tsx        # 3x2 capability grid
+    │
+    └── utils/
+        └── mathHelpers.ts          # Spherical interpolation & geometry utility functions
 ```
 
 ---
 
-## 🛠️ Tech Stack & Dependencies
-
-| Category | Technology | Purpose |
-|---|---|---|
-| **Core Framework** | React 19 (`react`, `react-dom`) | Modern component model & hooks |
-| **Language** | TypeScript 5 | Strict static typing and code reliability |
-| **Build Tool** | Vite 8 | Instant HMR and high-performance production bundling |
-| **Styling** | Tailwind CSS 3 & Custom CSS | Responsive layout, glassmorphism, keyframe animations |
-| **Icons** | Lucide React (`lucide-react`) | Clean, modern iconography |
-| **3D Rendering** | Three.js (`three`) | Optional WebGL rendering companion |
-
----
-
-## 🚀 Getting Started (Local Development)
+## 💻 Getting Started & Local Development
 
 ### Prerequisites
-- Node.js (v18.0 or newer recommended)
-- npm (v9.0 or newer)
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
 
-### 1. Install Dependencies
+### 1. Clone & Install Dependencies
 ```bash
+git clone https://github.com/your-username/nilo.git
+cd nilo
 npm install
 ```
 
-### 2. Run the Development Server
+### 2. Launch Local Development Server
 ```bash
 npm run dev
 ```
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173) in your browser to view the application with Hot Module Replacement (HMR).
+Navigate to `http://localhost:5173` to experience the Nilo Agentic OS with instant Hot Module Replacement (HMR).
 
 ### 3. Build for Production
 ```bash
 npm run build
 ```
-This runs `tsc` for type-checking and outputs the optimized static assets into the `dist/` directory.
+Executes TypeScript type-checking via `tsc` and packages high-performance static assets into `dist/`.
 
-### 4. Preview the Production Build
+### 4. Preview Production Build
 ```bash
 npm run preview
 ```
 
 ---
 
-## ☁️ AWS Cloud Deployment Guide
+## 🗺️ Roadmap: From Prototype to Native Agentic OS Kernel
 
-The project is structured for easy deployment to AWS:
-
-### Option A: AWS Amplify Hosting (Continuous Deployment)
-1. Push this repository to GitHub, GitLab, or AWS CodeCommit.
-2. In the [AWS Amplify Console](https://console.aws.amazon.com/amplify), choose **New app** > **Host web app**.
-3. Connect your repository and select your main branch.
-4. Amplify will automatically detect the [`amplify.yml`](file:///d:/Explaino/amplify.yml) file included in the root directory:
-   ```yaml
-   version: 1
-   frontend:
-     phases:
-       preBuild:
-         commands:
-           - npm ci
-       build:
-         commands:
-           - npm run build
-     artifacts:
-       baseDirectory: dist
-       files:
-         - '**/*'
-     cache:
-       paths:
-         - node_modules/**/*
-   ```
-5. Click **Save and Deploy**. Your site will be built, provided with an SSL certificate, and served globally through Amazon CloudFront.
-
-### Option B: Amazon S3 + CloudFront (Static Website Hosting)
-1. Build the production bundle:
-   ```bash
-   npm run build
-   ```
-2. Upload the `dist/` folder contents to your S3 bucket:
-   ```bash
-   aws s3 sync dist/ s3://<your-bucket-name> --delete
-   ```
-3. Configure CloudFront with the S3 bucket as the origin and set the default root object to `index.html`. Add an error response rule redirecting 404/403 to `/index.html` (HTTP 200) for SPA routing support.
+- [x] **Phase 1: Interface & Cognitive Mascot**
+  - High-performance 3D frosted-glass EXO Orb with continuous spherical math.
+  - Unified single-card auth with interactive companion reactions.
+  - 8-direction ergonomic radial menu with smooth bloom animations.
+- [x] **Phase 2: Modular 6-Pillar Ecosystem**
+  - Dedicated architecture for Chat, Voice, Digital Lab, Scratchpad, Games, and Books.
+  - Dynamic 10-task recent sessions stream with real-time timestamps and service badging.
+  - System-level focus guard controls (app, title, and screen area bounding).
+- [ ] **Phase 3: Live AI Model Integration (AWS Bedrock & WebSpeech)**
+  - Integrate Claude 3.5 Sonnet / Gemini 1.5 Pro via AWS Bedrock for real-time Socratic reasoning.
+  - Low-latency WebRTC speech pipeline with streaming Whisper transcriptions.
+  - Real-time OCR vision model for handwritten math formulas on the Scribble canvas.
+- [ ] **Phase 4: Desktop Native Wrap (Tauri / Electron)**
+  - True OS-level global hotkey listener (`Control+Space` triggers Nilo over any desktop app).
+  - Native system-level distraction blocking (hosts file DNS blacklisting & window manager hooks).
+  - Offline-first local vector database for instant syllabus searching.
 
 ---
 
-## 🔮 Future Roadmap & Backend Integration
-
-To expand Explaino into a full end-to-end voice learning product as outlined in the PRD:
-
-1. **AWS Bedrock / LLM Pipeline**:
-   - Stream voice transcriptions into Claude 3.5 Sonnet or Amazon Titan to evaluate student explanations using the Feynman scoring rubrics.
-   - Detect conceptual gaps and calculate confidence ratings (0–100%).
-2. **Audio Streaming & Voice Synthesis**:
-   - Integrate Amazon Transcribe Streaming (WebSocket) for real-time speech-to-text.
-   - Integrate Amazon Polly (or ElevenLabs) for natural, expressive EXO voice replies.
-3. **Interactive Knowledge Map**:
-   - Connect the Dashboard's "Knowledge Map" view to an interactive force-directed graph (D3.js or Three.js) visualizing unlocked and locked concept nodes.
-4. **User Auth & Persistence**:
-   - Attach AWS Cognito or Supabase for persistent multi-device student accounts and session history.
-
----
-
-*Authored for Explaino Core Team & AI Coding Agents.*
+<div align="center">
+  <sub>Built with ❤️ by the Nilo Engineering Team. Empowering every student to learn by explaining.</sub>
+</div>

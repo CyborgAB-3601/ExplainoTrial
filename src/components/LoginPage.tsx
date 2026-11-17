@@ -30,7 +30,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({
     if (onSuccessAuth) {
       onSuccessAuth({
         name: mode === 'signup' ? name || 'Student' : undefined,
-        email: email || 'student@explaino.ai',
+        email: email || 'student@nilo.ai',
       });
     }
   };
@@ -58,7 +58,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({
             </div>
           </div>
           <span className="text-xl font-extrabold tracking-wide text-[#1E1B2E] font-sans">
-            EXPLAINO
+            NILO
           </span>
         </div>
 
@@ -98,7 +98,7 @@ export const LoginPage: React.FC<AuthPageProps> = ({
           {/* Welcome Headline */}
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.15]">
             <span className="text-[#1E1B2E]">{isLogin ? 'Welcome to ' : 'Start with '}</span>
-            <span className="text-gradient-brand">EXPLAINO</span>
+            <span className="text-gradient-brand">NILO</span>
           </h1>
           <p className="text-base sm:text-lg text-[#6B7280] font-normal mt-2.5">
             {isLogin 

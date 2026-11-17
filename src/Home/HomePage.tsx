@@ -30,7 +30,9 @@ import {
   Play,
   ArrowRight,
   ArrowLeft,
-  BookOpen
+  BookOpen,
+  Mic,
+  Pencil
 } from 'lucide-react';
 import { ExoOrb } from '../components/ExoOrb';
 import { VoiceAgent } from '../Voice';
@@ -49,14 +51,19 @@ export interface HomePageProps {
   onLogout?: () => void;
 }
 
-interface MenuItem {
+interface RecentTask {
   id: string;
   title: string;
+  service: 'Speak with Nilo' | 'Scratchpad' | 'Digital Lab' | 'Books' | 'Concept Games' | 'Socratic Chat';
+  serviceType: 'speak' | 'scratchpad' | 'digitallab' | 'books' | 'games' | 'chat';
+  timeAgo: string;
   shortcut: string;
-  iconType: 'flower' | 'ps' | 'obsidian' | 'gimp' | 'discord' | 'minecraft' | 'youtube' | 'firefox';
   tags: string[];
+  status?: string;
   bound: boolean;
 }
+
+type MenuItem = RecentTask;
 
 interface RadialNode {
   id: number;
@@ -75,7 +82,9 @@ export const HomePage: React.FC<HomePageProps> = ({
   onLogout,
 }) => {
   // Navigation & Search States
-  const [selectedMenuId, setSelectedMenuId] = useState<string>('example');
+  const [selectedTaskId, setSelectedTaskId] = useState<string>('task-1');
+  const selectedMenuId = selectedTaskId;
+  const setSelectedMenuId = setSelectedTaskId;
   const [searchQuery, setSearchQuery] = useState('');
   const [activeRadialNode, setActiveRadialNode] = useState<number | null>(null);
   const [hoveredRadialNode, setHoveredRadialNode] = useState<number | null>(null);
@@ -147,27 +156,134 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [quickSelectKey, setQuickSelectKey] = useState('Backspace');
   const [centerWorkflowAction, setCenterWorkflowAction] = useState('Close Menu');
 
-  // Menus List
-  const [menus, setMenus] = useState<MenuItem[]>([
-    { id: 'example', title: 'Example Menu', shortcut: 'Control+Space', iconType: 'flower', tags: ['games'], bound: true },
-    { id: 'photoshop', title: 'Photoshop', shortcut: 'Control+Space', iconType: 'ps', tags: ['design', 'graphics'], bound: true },
-    { id: 'obsidian', title: 'Obsidian', shortcut: 'Control+Space', iconType: 'obsidian', tags: ['notes', 'knowledge'], bound: true },
-    { id: 'gimp', title: 'GIMP', shortcut: 'Control+4', iconType: 'gimp', tags: ['editing'], bound: true },
-    { id: 'discord', title: 'Discord', shortcut: 'Control+4', iconType: 'discord', tags: ['social', 'voice'], bound: true },
-    { id: 'minecraft', title: 'Minecraft', shortcut: 'Control+4', iconType: 'minecraft', tags: ['games'], bound: true },
-    { id: 'youtube', title: 'YouTube', shortcut: 'Not Bound', iconType: 'youtube', tags: ['media'], bound: false },
-    { id: 'firefox', title: 'Firefox', shortcut: 'Not Bound', iconType: 'firefox', tags: ['browser'], bound: false },
+  // 10 Recent Tasks across Nilo Services (Speak with Nilo, Scratchpad, Digital Lab, Books, etc.)
+  const [tasks, setTasks] = useState<RecentTask[]>([
+    {
+      id: 'task-1',
+      title: 'Photosynthesis & ATP Yield',
+      service: 'Speak with Nilo',
+      serviceType: 'speak',
+      timeAgo: '5m ago',
+      shortcut: 'Control+1',
+      tags: ['biology', 'oral-exam'],
+      status: '82% Mastery Verified',
+      bound: true,
+    },
+    {
+      id: 'task-2',
+      title: 'Quadratic Roots & Factoring',
+      service: 'Scratchpad',
+      serviceType: 'scratchpad',
+      timeAgo: '18m ago',
+      shortcut: 'Control+2',
+      tags: ['maths', 'algebra'],
+      status: 'All steps verified',
+      bound: true,
+    },
+    {
+      id: 'task-3',
+      title: 'O₂ Evolution Rate Sandbox',
+      service: 'Digital Lab',
+      serviceType: 'digitallab',
+      timeAgo: '42m ago',
+      shortcut: 'Control+3',
+      tags: ['science', 'simulation'],
+      status: 'Experiment saved',
+      bound: true,
+    },
+    {
+      id: 'task-4',
+      title: 'CBSE Ch 6: Life Processes',
+      service: 'Books',
+      serviceType: 'books',
+      timeAgo: '1h ago',
+      shortcut: 'Control+4',
+      tags: ['class-10', 'ncert'],
+      status: 'Chapter 2 / 5 completed',
+      bound: true,
+    },
+    {
+      id: 'task-5',
+      title: 'Geometry Math Dash (Lvl 3)',
+      service: 'Concept Games',
+      serviceType: 'games',
+      timeAgo: '2h ago',
+      shortcut: 'Control+5',
+      tags: ['arcade', 'speed'],
+      status: 'High score: 1,420',
+      bound: true,
+    },
+    {
+      id: 'task-6',
+      title: 'Faraday’s Induction Derivation',
+      service: 'Speak with Nilo',
+      serviceType: 'speak',
+      timeAgo: '3h ago',
+      shortcut: 'Control+6',
+      tags: ['physics', 'electromagnetism'],
+      status: 'Needs 1 prerequisite fix',
+      bound: true,
+    },
+    {
+      id: 'task-7',
+      title: 'Trigonometric Identities Canvas',
+      service: 'Scratchpad',
+      serviceType: 'scratchpad',
+      timeAgo: '5h ago',
+      shortcut: 'Control+7',
+      tags: ['maths', 'geometry'],
+      status: 'Draft canvas saved',
+      bound: true,
+    },
+    {
+      id: 'task-8',
+      title: 'Acid-Base Titration Curves',
+      service: 'Digital Lab',
+      serviceType: 'digitallab',
+      timeAgo: 'Yesterday',
+      shortcut: 'Control+8',
+      tags: ['chemistry', 'kinetics'],
+      status: 'pH graph exported',
+      bound: true,
+    },
+    {
+      id: 'task-9',
+      title: 'CBSE Ch 9: Light & Reflection',
+      service: 'Books',
+      serviceType: 'books',
+      timeAgo: 'Yesterday',
+      shortcut: 'Control+9',
+      tags: ['class-10', 'optics'],
+      status: 'Ex-libris shelved',
+      bound: true,
+    },
+    {
+      id: 'task-10',
+      title: 'Thermodynamics Dialogue',
+      service: 'Socratic Chat',
+      serviceType: 'chat',
+      timeAgo: '2 days ago',
+      shortcut: 'Control+0',
+      tags: ['physics', 'socratic'],
+      status: '12 turns discussed',
+      bound: true,
+    },
   ]);
 
-  const activeMenu = useMemo(() => {
-    return menus.find(m => m.id === selectedMenuId) || menus[0];
-  }, [menus, selectedMenuId]);
+  const menus = tasks;
+  const setMenus = setTasks;
 
-  const filteredMenus = useMemo(() => {
-    if (!searchQuery.trim()) return menus;
+  const activeTask = useMemo(() => {
+    return tasks.find(t => t.id === selectedTaskId) || tasks[0];
+  }, [tasks, selectedTaskId]);
+  const activeMenu = activeTask;
+
+  const filteredTasks = useMemo(() => {
+    if (!searchQuery.trim()) return tasks;
     const q = searchQuery.toLowerCase();
-    return menus.filter(m => m.title.toLowerCase().includes(q) || m.tags.some(t => t.toLowerCase().includes(q)));
-  }, [menus, searchQuery]);
+    return tasks.filter(t => t.title.toLowerCase().includes(q) || t.service.toLowerCase().includes(q) || t.tags.some(tag => tag.toLowerCase().includes(q)));
+  }, [tasks, searchQuery]);
+  const filteredMenus = filteredTasks;
 
   // Radial Menu Nodes (8 items, 45° step starting from top 12 o'clock)
   const radialNodes: RadialNode[] = [
@@ -235,85 +351,166 @@ export const HomePage: React.FC<HomePageProps> = ({
     }
   };
 
-  const handleAddMenu = () => {
-    const newId = `menu-${Date.now()}`;
-    const newMenu: MenuItem = {
-      id: newId,
-      title: 'New Subject Menu',
-      shortcut: 'Control+N',
-      iconType: 'flower',
-      tags: ['study'],
+  const NEW_TASK_TEMPLATES: Array<Omit<RecentTask, 'id' | 'timeAgo'>> = [
+    {
+      title: 'DNA Replication & Polymerase',
+      service: 'Speak with Nilo',
+      serviceType: 'speak',
+      shortcut: 'Control+1',
+      tags: ['genetics', 'oral-exam'],
+      status: 'In progress',
       bound: true,
+    },
+    {
+      title: 'Integration by Parts Canvas',
+      service: 'Scratchpad',
+      serviceType: 'scratchpad',
+      shortcut: 'Control+2',
+      tags: ['calculus', 'derivation'],
+      status: 'Draft canvas saved',
+      bound: true,
+    },
+    {
+      title: 'Photoelectric Effect Sandbox',
+      service: 'Digital Lab',
+      serviceType: 'digitallab',
+      shortcut: 'Control+3',
+      tags: ['quantum', 'simulation'],
+      status: 'Frequency sweep completed',
+      bound: true,
+    },
+    {
+      title: 'CBSE Ch 10: Human Eye & Spectrum',
+      service: 'Books',
+      serviceType: 'books',
+      shortcut: 'Control+4',
+      tags: ['class-10', 'physics'],
+      status: 'Page 142 bookmarked',
+      bound: true,
+    },
+    {
+      title: 'Trig Orbit Velocity Game',
+      service: 'Concept Games',
+      serviceType: 'games',
+      shortcut: 'Control+5',
+      tags: ['arcade', 'maths'],
+      status: 'High score: 2,150',
+      bound: true,
+    },
+    {
+      title: 'Entropy & Statistical Mechanics',
+      service: 'Socratic Chat',
+      serviceType: 'chat',
+      shortcut: 'Control+6',
+      tags: ['thermodynamics', 'socratic'],
+      status: '8 turns discussed',
+      bound: true,
+    },
+  ];
+
+  const handleAddTask = () => {
+    const template = NEW_TASK_TEMPLATES[Math.floor(Math.random() * NEW_TASK_TEMPLATES.length)];
+    const newTask: RecentTask = {
+      ...template,
+      id: `task-${Date.now()}`,
+      timeAgo: 'Just now',
     };
-    setMenus(prev => [...prev, newMenu]);
-    setSelectedMenuId(newId);
+    // Always keep strictly 10 recent tasks
+    setTasks(prev => [newTask, ...prev.filter(t => t.id !== newTask.id)].slice(0, 10));
+    setSelectedTaskId(newTask.id);
   };
+  const handleAddMenu = handleAddTask;
 
   const handleDeleteMenu = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (menus.length <= 1) return;
-    setMenus(prev => prev.filter(m => m.id !== id));
-    if (selectedMenuId === id) {
-      const remaining = menus.filter(m => m.id !== id);
-      setSelectedMenuId(remaining[0].id);
+    if (tasks.length <= 1) return;
+    setTasks(prev => prev.filter(m => m.id !== id));
+    if (selectedTaskId === id) {
+      const remaining = tasks.filter(m => m.id !== id);
+      setSelectedTaskId(remaining[0].id);
     }
   };
 
-  // Render Left Menu Icons
-  const renderMenuIcon = (type: MenuItem['iconType']) => {
+  const handleOpenTask = (task: RecentTask) => {
+    switch (task.serviceType) {
+      case 'speak':
+        handleCenterOrbClick();
+        break;
+      case 'scratchpad':
+        setActiveFeature('scratchpad');
+        break;
+      case 'digitallab':
+        setActiveFeature('digitallab');
+        break;
+      case 'books':
+        setActiveFeature('resources');
+        break;
+      case 'games':
+        setActiveFeature('games');
+        break;
+      case 'chat':
+        setActiveFeature('chat');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Render Service Icons with sleek gradients and clear Nilo branding
+  const renderServiceIcon = (type: string, size: 'small' | 'large' = 'small') => {
+    const isLg = size === 'large';
+    const containerClasses = isLg
+      ? 'w-14 h-14 rounded-2xl flex items-center justify-center shadow-md'
+      : 'w-8 h-8 rounded-xl flex items-center justify-center shadow-xs';
+    const iconClasses = isLg ? 'w-7 h-7 stroke-[2.2]' : 'w-4 h-4 stroke-[2.2]';
+
     switch (type) {
-      case 'flower':
+      case 'speak':
         return (
-          <div className="w-8 h-8 rounded-full bg-[#8E2856] flex items-center justify-center shadow-xs">
-            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" aria-hidden="true">
-              <path d="M12 2C10.5 5 8 7 5 7C7 9.5 7 12 5 14.5C8 14.5 10.5 16.5 12 19.5C13.5 16.5 16 14.5 19 14.5C17 12 17 9.5 19 7C16 7 13.5 5 12 2Z" />
-            </svg>
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#651A3B] to-[#EC4899] text-white`} title="Speak with Nilo">
+            <Mic className={iconClasses} />
           </div>
         );
-      case 'ps':
+      case 'scratchpad':
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#001D26] border border-[#00C8FF]/40 text-[#00C8FF] font-black text-xs flex items-center justify-center tracking-tighter">
-            Ps
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#4F46E5] to-[#38BDF8] text-white`} title="Scratchpad">
+            <Pencil className={iconClasses} />
           </div>
         );
-      case 'obsidian':
+      case 'digitallab':
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#1E1528] text-[#8B5CF6] font-bold text-xs flex items-center justify-center shadow-xs">
-            <div className="w-4 h-4 rotate-45 border-2 border-[#8B5CF6] rounded-xs bg-[#8B5CF6]/30" />
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#059669] to-[#10B981] text-white`} title="Digital Lab">
+            <FlaskConical className={iconClasses} />
           </div>
         );
-      case 'gimp':
+      case 'books':
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#5A5243] text-amber-100 font-bold text-xs flex items-center justify-center">
-            🦊
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#D97706] to-[#F59E0B] text-white`} title="Books & Resources">
+            <BookOpen className={iconClasses} />
           </div>
         );
-      case 'discord':
+      case 'games':
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#5865F2] text-white font-bold text-xs flex items-center justify-center">
-            💬
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#7C3AED] to-[#D946EF] text-white`} title="Concept Games">
+            <Gamepad2 className={iconClasses} />
           </div>
         );
-      case 'minecraft':
+      case 'chat':
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#4E7E36] border-b-2 border-[#6B4726] text-white font-bold text-xs flex items-center justify-center">
-            🧱
+          <div className={`${containerClasses} bg-gradient-to-tr from-[#2563EB] to-[#7C3AED] text-white`} title="Socratic Chat">
+            <MessageSquare className={iconClasses} />
           </div>
         );
-      case 'youtube':
+      default:
         return (
-          <div className="w-8 h-8 rounded-lg bg-[#FF0000] text-white font-bold text-xs flex items-center justify-center">
-            ▶
-          </div>
-        );
-      case 'firefox':
-        return (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-red-500 text-white font-bold text-xs flex items-center justify-center">
-            🔥
+          <div className={`${containerClasses} bg-[#8E2856] text-white`}>
+            <Sparkles className={iconClasses} />
           </div>
         );
     }
   };
+
+  const renderMenuIcon = (type: string) => renderServiceIcon(type, 'small');
 
   // Render Radial Node Icon
   const renderRadialIcon = (icon: RadialNode['icon']) => {
@@ -421,7 +618,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <button
             onClick={handleAddMenu}
             className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-purple-600 hover:bg-white/80 transition-all cursor-pointer"
-            title="Create New Menu"
+            title="Create New Task"
           >
             <Plus className="w-4 h-4" />
           </button>
@@ -438,36 +635,41 @@ export const HomePage: React.FC<HomePageProps> = ({
       </aside>
 
       {/* =========================================================================
-          2. LEFT MENU LIST ("ALL MENUS") (Width: 260px)
+          2. LEFT MENU LIST ("RECENT TASKS") (Width: 260px)
          ========================================================================= */}
       <section className={`fixed top-0 left-[52px] w-64 h-full flex flex-col border-r border-[#EBE6F0] bg-white/60 backdrop-blur-lg z-20 transition-transform duration-600 ease-in-out ${
         isMeltActive ? '-translate-x-[calc(100%+52px)] opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'
       }`}>
         {/* Header */}
         <div className="h-14 px-4 flex items-center justify-between border-b border-[#EBE6F0]/60 shrink-0">
-          <span className="font-extrabold text-[15px] tracking-tight text-[#1E1926]">
-            All Menus
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-[15px] tracking-tight text-[#1E1926]">
+              Recent Tasks
+            </span>
+            <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
+              {filteredTasks.length}
+            </span>
+          </div>
           <button
             onClick={() => {
               const el = document.getElementById('kando-search-input');
               el?.focus();
             }}
             className="p-1.5 rounded-lg text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors cursor-pointer"
-            title="Search Menus"
+            title="Search Recent Tasks"
           >
             <Search className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Optional Search Bar input */}
+        {/* Search Bar input */}
         <div className="px-3 pt-2.5 pb-1">
           <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white/80 border border-slate-200/80 text-xs shadow-xs focus-within:border-purple-400 transition-colors">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <input
               id="kando-search-input"
               type="text"
-              placeholder="Filter menus..."
+              placeholder="Search recent tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent outline-none text-[#2C2936] placeholder:text-slate-400 text-xs"
@@ -475,31 +677,35 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </div>
 
-        {/* Menu Cards Stack */}
+        {/* Task Cards Stack (Strictly 10 items) */}
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {filteredMenus.map((menu) => {
-            const isSelected = menu.id === selectedMenuId;
+          {filteredTasks.map((task) => {
+            const isSelected = task.id === selectedTaskId;
             return (
               <div
-                key={menu.id}
-                onClick={() => setSelectedMenuId(menu.id)}
+                key={task.id}
+                onClick={() => setSelectedTaskId(task.id)}
+                onDoubleClick={() => handleOpenTask(task)}
                 className={`group relative rounded-2xl p-2.5 flex items-center justify-between cursor-pointer transition-all duration-200 border ${
                   isSelected
                     ? 'bg-[#FAF2F6] border-[#8E2856] shadow-[0_4px_16px_rgba(142,40,86,0.14)] ring-1 ring-[#8E2856]/40'
                     : 'bg-white/85 hover:bg-white border-white/80 hover:border-slate-200 shadow-xs'
                 }`}
+                title={`Double-click to open in ${task.service}`}
               >
-                {/* Left: Icon + Title & Shortcut */}
+                {/* Left: Icon + Title & Subtitle */}
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="shrink-0">
-                    {renderMenuIcon(menu.iconType)}
+                    {renderServiceIcon(task.serviceType, 'small')}
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="text-[13px] font-bold tracking-tight text-[#1E1926] truncate">
-                      {menu.title}
+                      {task.title}
                     </span>
-                    <span className="text-[11px] font-medium text-slate-500 truncate">
-                      {menu.shortcut}
+                    <span className="text-[11px] font-medium text-slate-500 truncate flex items-center gap-1.5">
+                      <span className="text-purple-900/85 font-semibold">{task.service}</span>
+                      <span className="text-slate-300">•</span>
+                      <span>{task.timeAgo}</span>
                     </span>
                   </div>
                 </div>
@@ -510,25 +716,34 @@ export const HomePage: React.FC<HomePageProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        handleOpenTask(task);
                       }}
-                      className="p-1 rounded-md hover:text-[#8E2856] hover:bg-pink-100/60 transition-colors"
-                      title="Export / Share"
+                      className="p-1 rounded-md text-[#8E2856] hover:bg-pink-100/60 transition-colors"
+                      title={`Open in ${task.service}`}
                     >
-                      <Share2 className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        const dupTask: RecentTask = {
+                          ...task,
+                          id: `task-${Date.now()}`,
+                          title: `${task.title} (Copy)`,
+                          timeAgo: 'Just now',
+                        };
+                        setTasks(prev => [dupTask, ...prev].slice(0, 10));
+                        setSelectedTaskId(dupTask.id);
                       }}
                       className="p-1 rounded-md hover:text-[#8E2856] hover:bg-pink-100/60 transition-colors"
-                      title="Duplicate"
+                      title="Duplicate Task"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={(e) => handleDeleteMenu(menu.id, e)}
+                      onClick={(e) => handleDeleteMenu(task.id, e)}
                       className="p-1 rounded-md hover:text-red-600 hover:bg-red-100/60 transition-colors"
-                      title="Delete Menu"
+                      title="Delete Task"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -539,19 +754,19 @@ export const HomePage: React.FC<HomePageProps> = ({
           })}
         </div>
 
-        {/* Bottom Action Buttons: + Add Menu & Download */}
+        {/* Bottom Action Buttons: + Add Task & Export */}
         <div className="p-3 border-t border-[#EBE6F0]/70 flex items-center gap-2 shrink-0 bg-white/40">
           <button
-            onClick={handleAddMenu}
+            onClick={handleAddTask}
             className="flex-1 py-2 px-3 rounded-xl bg-white/90 hover:bg-white border border-slate-200/90 text-[12px] font-bold text-slate-700 hover:text-purple-700 shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Menu</span>
+            <span>Add Task</span>
           </button>
           <button
             onClick={() => {}}
             className="p-2 rounded-xl bg-white/90 hover:bg-white border border-slate-200/90 text-slate-600 hover:text-purple-700 shadow-xs transition-colors cursor-pointer"
-            title="Import Menu"
+            title="Export Tasks"
           >
             <Download className="w-4 h-4" />
           </button>
@@ -1004,15 +1219,33 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           
           {/* Header Preview Badge + Menu Title */}
-          <div className="flex flex-col items-center pt-2">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#651A3B] to-[#8E2856] p-1 shadow-md flex items-center justify-center mb-2">
-              {renderMenuIcon(activeMenu.iconType)}
+          <div className="flex flex-col items-center pt-2 text-center">
+            <div className="mb-2">
+              {renderServiceIcon(activeTask.serviceType, 'large')}
             </div>
 
             <h2 className="text-base font-extrabold tracking-tight text-[#1E1926]">
-              {activeMenu.title}
+              {activeTask.title}
             </h2>
-            <div className="flex items-center gap-1.5 mt-1 text-slate-400">
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full">
+                {activeTask.service}
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">
+                {activeTask.timeAgo}
+              </span>
+            </div>
+
+            {/* Quick Open in Service Button */}
+            <button
+              onClick={() => handleOpenTask(activeTask)}
+              className="w-full mt-3 py-2 px-3 rounded-xl bg-gradient-to-r from-[#651A3B] to-[#8E2856] hover:from-[#50142e] hover:to-[#782249] text-white font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Open in {activeTask.service}</span>
+            </button>
+
+            <div className="flex items-center gap-1.5 mt-3 text-slate-400">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
               <span className="w-8 h-[1px] bg-slate-200" />
               <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />

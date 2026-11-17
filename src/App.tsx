@@ -12,7 +12,7 @@ export default function App() {
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'signup'>('login');
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string }>({
     name: 'Abhinav',
-    email: 'jasmin@explaino.ai',
+    email: 'jasmin@nilo.ai',
   });
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);

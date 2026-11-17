@@ -1,6 +1,6 @@
-# 🚀 Explaino — Core Features Specification & Roadmap (`features.md`)
+# 🚀 Nilo — Core Features Specification & Roadmap (`features.md`)
 
-> **Comprehensive feature specification document for Explaino's four pillar learning capabilities.**  
+> **Comprehensive feature specification document for Nilo's four pillar learning capabilities.**  
 > *Transforming passive studying into active mastery through conversational voice AI, intelligent handwriting recognition, gamified concept challenges, and immersive virtual experiment sandboxes.*
 
 ---
@@ -38,11 +38,11 @@
 
 ## 🌟 Executive Summary & Product Pillars
 
-Explaino shifts learning from passive memorization to active demonstration. Grounded in the **Feynman Technique** ("if you can't explain it simply, you don't understand it well enough"), Explaino creates an interconnected 4-pillar learning ecosystem:
+Nilo shifts learning from passive memorization to active demonstration. Grounded in the **Feynman Technique** ("if you can't explain it simply, you don't understand it well enough"), Nilo creates an interconnected 4-pillar learning ecosystem:
 
 ```
                   ┌───────────────────────────────────────────────┐
-                  │                 EXPLAINO PLATFORM             │
+                  │                   NILO PLATFORM               │
                   └───────────────────────┬───────────────────────┘
                                           │
          ┌──────────────────┬─────────────┴───────┬──────────────────┐
@@ -92,7 +92,7 @@ The evaluation engine analyzes the explanation across 3 dimensions:
 ---
 
 ### 1.3 Dynamic Mind Map & Knowledge Graph
-Whenever an explanation is evaluated, Explaino automatically constructs or updates a **Dynamic Topic Mind Map**:
+Whenever an explanation is evaluated, Nilo automatically constructs or updates a **Dynamic Topic Mind Map**:
 
 ```
                        [Photosynthesis]
@@ -349,5 +349,5 @@ All four features interconnect to form an unbroken learning loop:
 
 ---
 
-*Authored for the **Explaino** Engineering & Product Team. Document Version: 1.0.0*
+*Authored for the **Nilo** Engineering & Product Team. Document Version: 1.0.0*
 

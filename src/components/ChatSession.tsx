@@ -605,7 +605,7 @@ export const ChatSession: React.FC<ChatSessionProps> = ({
                   </div>
                 </div>
               </div>
-              <span className="text-base font-extrabold tracking-wide text-[#1E1B2E]">EXPLAINO</span>
+              <span className="text-base font-extrabold tracking-wide text-[#1E1B2E]">NILO</span>
             </div>
           </div>
 

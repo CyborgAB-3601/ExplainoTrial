@@ -73,7 +73,7 @@ export const GeometryDashMathGame: React.FC<GeometryDashMathGameProps> = ({
   const [currentLane, setCurrentLane] = useState<-1 | 1>(-1); // -1 = Left, 1 = Right
   const [feedbackEffect, setFeedbackEffect] = useState<{ text: string; isCorrect: boolean } | null>(null);
   const [highScore, setHighScore] = useState(() => {
-    return parseInt(localStorage.getItem('explaino_geometry_highscore') || '450', 10);
+    return parseInt(localStorage.getItem('nilo_geometry_highscore') || '450', 10);
   });
 
   // Track game state in ref for animation loop
@@ -973,7 +973,7 @@ export const GeometryDashMathGame: React.FC<GeometryDashMathGameProps> = ({
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
-      localStorage.setItem('explaino_geometry_highscore', score.toString());
+      localStorage.setItem('nilo_geometry_highscore', score.toString());
     }
   }, [score, highScore]);
 
